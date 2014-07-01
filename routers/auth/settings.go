@@ -17,8 +17,8 @@ package auth
 import (
 	"github.com/astaxie/beego"
 
-	"github.com/beego/wetalk/modules/auth"
-	"github.com/beego/wetalk/routers/base"
+	"github.com/EPICPaaS/wetalk/modules/auth"
+	"github.com/EPICPaaS/wetalk/routers/base"
 )
 
 // SettingsRouter serves user settings.

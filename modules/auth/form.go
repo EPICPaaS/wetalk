@@ -20,20 +20,23 @@ import (
 	"github.com/astaxie/beego/validation"
 	"github.com/beego/i18n"
 
-	"github.com/beego/wetalk/modules/models"
-	"github.com/beego/wetalk/modules/utils"
-	"github.com/beego/wetalk/setting"
+	"github.com/EPICPaaS/wetalk/modules/models"
+	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/setting"
 )
 
 // Register form
 type RegisterForm struct {
-	UserName   string      `valid:"Required;AlphaDash;MinSize(5);MaxSize(30)"`
-	Email      string      `valid:"Required;Email;MaxSize(80)"`
-	Password   string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
-	PasswordRe string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
-	Captcha    string      `form:"type(captcha)" valid:"Required"`
-	CaptchaId  string      `form:"type(empty)"`
-	Locale     i18n.Locale `form:"-"`
+	UserName    string      `valid:"Required;AlphaDash;MinSize(5);MaxSize(30)"`
+	Email       string      `valid:"Required;Email;MaxSize(80)"`
+	CompanyName string      `valid:"MinSize(3);MaxSize(300)"`
+	QQ          string      `valid:"Required;MinSize(5);MaxSize(20)"`
+	TelNum      string      `valid:"Phone"`
+	Password    string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
+	PasswordRe  string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
+	Captcha     string      `form:"type(captcha)" valid:"Required"`
+	CaptchaId   string      `form:"type(empty)"`
+	Locale      i18n.Locale `form:"-"`
 }
 
 func (form *RegisterForm) Valid(v *validation.Validation) {
@@ -61,11 +64,15 @@ func (form *RegisterForm) Valid(v *validation.Validation) {
 
 func (form *RegisterForm) Labels() map[string]string {
 	return map[string]string{
-		"UserName":   "auth.login_username",
-		"Email":      "auth.login_email",
-		"Password":   "auth.login_password",
-		"PasswordRe": "auth.retype_password",
-		"Captcha":    "auth.captcha",
+		"UserName":    "auth.login_username",
+		"Email":       "auth.login_email",
+		"CompanyName": "auth.companyNme",
+		"QQ":          "auth.qq",
+		"TelNum":      "auth.telNum",
+		"Password":    "auth.login_password",
+		"PasswordRe":  "auth.retype_password",
+
+		"Captcha": "auth.captcha",
 	}
 }
 
@@ -78,11 +85,14 @@ func (form *RegisterForm) Helps() map[string]string {
 
 func (form *RegisterForm) Placeholders() map[string]string {
 	return map[string]string{
-		"UserName":   "auth.plz_enter_username",
-		"Email":      "auth.plz_enter_email",
-		"Password":   "auth.plz_enter_password",
-		"PasswordRe": "auth.plz_reenter_password",
-		"Captcha":    "auth.plz_enter_captcha",
+		"UserName":    "auth.plz_enter_username",
+		"Email":       "auth.plz_enter_email",
+		"CompanyName": "auth.plz_enter_companyNme",
+		"QQ":          "auth.plz_enter_qq",
+		"TelNum":      "auth.plz_enter_telNum",
+		"Password":    "auth.plz_enter_password",
+		"PasswordRe":  "auth.plz_reenter_password",
+		"Captcha":     "auth.plz_enter_captcha",
 	}
 }
 
@@ -311,6 +321,8 @@ type UserAdminForm struct {
 	NickName    string                  `valid:"Required;MaxSize(30)"`
 	Url         string                  `valid:"MaxSize(100)"`
 	Company     string                  `valid:"MaxSize(30)"`
+	QQ          string                  `valid:"Required;MinSize(5);MaxSize(20)"`
+	TelNum      string                  `valid:"Phone"`
 	Location    string                  `valid:"MaxSize(30)"`
 	Info        string                  `form:"type(textarea)" valid:"MaxSize(255)"`
 	GrEmail     string                  `valid:"Required;MaxSize(80)"`

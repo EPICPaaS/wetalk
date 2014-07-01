@@ -15,8 +15,8 @@
 package article
 
 import (
-	"github.com/beego/wetalk/modules/models"
-	"github.com/beego/wetalk/routers/base"
+	"github.com/EPICPaaS/wetalk/modules/models"
+	"github.com/EPICPaaS/wetalk/routers/base"
 )
 
 type ArticleRouter struct {

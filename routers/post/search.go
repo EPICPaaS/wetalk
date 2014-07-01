@@ -19,9 +19,9 @@ import (
 
 	"github.com/astaxie/beego"
 
-	"github.com/beego/wetalk/modules/post"
-	"github.com/beego/wetalk/modules/utils"
-	"github.com/beego/wetalk/routers/base"
+	"github.com/EPICPaaS/wetalk/modules/post"
+	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/routers/base"
 )
 
 type SearchRouter struct {

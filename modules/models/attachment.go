@@ -21,8 +21,8 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 
-	"github.com/beego/wetalk/modules/utils"
-	"github.com/beego/wetalk/setting"
+	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/setting"
 )
 
 type Image struct {

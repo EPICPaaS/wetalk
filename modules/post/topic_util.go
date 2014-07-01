@@ -19,7 +19,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 
-	"github.com/beego/wetalk/modules/models"
+	"github.com/EPICPaaS/wetalk/modules/models"
 )
 
 func ListCategories(cats *[]models.Category) (int64, error) {

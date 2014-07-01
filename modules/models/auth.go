@@ -20,8 +20,8 @@ import (
 
 	"github.com/astaxie/beego/orm"
 
-	"github.com/beego/wetalk/modules/utils"
-	"github.com/beego/wetalk/setting"
+	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/setting"
 )
 
 // global settings name -> value
@@ -65,6 +65,8 @@ type User struct {
 	Rands       string           `orm:"size(10)"`
 	Created     time.Time        `orm:"auto_now_add"`
 	Updated     time.Time        `orm:"auto_now"`
+	QQ          string           `orm:"size(20)"`
+	TelNum      string           `orm:"size(30)"`
 }
 
 func (m *User) Insert() error {

@@ -17,9 +17,9 @@ package auth
 import (
 	"github.com/astaxie/beego/orm"
 
-	"github.com/beego/wetalk/modules/models"
-	"github.com/beego/wetalk/modules/utils"
-	"github.com/beego/wetalk/routers/base"
+	"github.com/EPICPaaS/wetalk/modules/models"
+	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/routers/base"
 )
 
 type UserRouter struct {

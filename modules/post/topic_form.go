@@ -17,8 +17,8 @@ package post
 import (
 	"github.com/astaxie/beego/validation"
 
-	"github.com/beego/wetalk/modules/models"
-	"github.com/beego/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/modules/models"
+	"github.com/EPICPaaS/wetalk/modules/utils"
 )
 
 type TopicAdminForm struct {

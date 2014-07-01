@@ -18,11 +18,11 @@ import (
 	"github.com/astaxie/beego"
 	"strings"
 
-	"github.com/beego/wetalk/modules/auth"
-	"github.com/beego/wetalk/modules/models"
-	"github.com/beego/wetalk/modules/utils"
-	"github.com/beego/wetalk/routers/base"
-	"github.com/beego/wetalk/setting"
+	"github.com/EPICPaaS/wetalk/modules/auth"
+	"github.com/EPICPaaS/wetalk/modules/models"
+	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/routers/base"
+	"github.com/EPICPaaS/wetalk/setting"
 )
 
 // LoginRouter serves login page.
@@ -164,7 +164,9 @@ func (this *RegisterRouter) Register() {
 
 	// Create new user.
 	user := new(models.User)
-
+	user.Company = form.CompanyName
+	user.QQ = form.QQ
+	user.TelNum = form.TelNum
 	if err := auth.RegisterUser(user, form.UserName, form.Email, form.Password); err == nil {
 		auth.SendRegisterMail(this.Locale, user)
 

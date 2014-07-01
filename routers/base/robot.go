@@ -21,7 +21,7 @@ import (
 
 	"github.com/astaxie/beego"
 
-	"github.com/beego/wetalk/setting"
+	"github.com/EPICPaaS/wetalk/setting"
 )
 
 var robotTxt string

@@ -27,10 +27,10 @@ import (
 	"github.com/astaxie/beego/validation"
 	"github.com/beego/i18n"
 
-	"github.com/beego/wetalk/modules/auth"
-	"github.com/beego/wetalk/modules/models"
-	"github.com/beego/wetalk/modules/utils"
-	"github.com/beego/wetalk/setting"
+	"github.com/EPICPaaS/wetalk/modules/auth"
+	"github.com/EPICPaaS/wetalk/modules/models"
+	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/setting"
 )
 
 type NestPreparer interface {
@@ -170,10 +170,10 @@ func (this *BaseRouter) CheckActiveRedirect(args ...interface{}) bool {
 		}
 
 		// redirect to active page
-		if !this.User.IsActive {
-			this.FlashRedirect("/settings/profile", code, "NeedActive")
-			return true
-		}
+		//if !this.User.IsActive {
+		//	this.FlashRedirect("/settings/profile", code, "NeedActive")
+		//	return true
+		//}
 	} else {
 		// no need active
 		if this.User.IsActive {

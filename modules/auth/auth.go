@@ -25,9 +25,9 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/session"
 
-	"github.com/beego/wetalk/modules/models"
-	"github.com/beego/wetalk/modules/utils"
-	"github.com/beego/wetalk/setting"
+	"github.com/EPICPaaS/wetalk/modules/models"
+	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/setting"
 )
 
 // CanRegistered checks if the username or e-mail is available.
@@ -93,6 +93,9 @@ func RegisterUser(user *models.User, username, email, password string) error {
 
 	// Use username as default nickname.
 	user.NickName = user.UserName
+
+	//设置用户默认激活
+	user.IsActive = true
 
 	return user.Insert()
 }

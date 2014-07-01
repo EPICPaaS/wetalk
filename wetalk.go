@@ -21,15 +21,15 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/beego/social-auth"
 
-	"github.com/beego/wetalk/modules/utils"
-	"github.com/beego/wetalk/routers/admin"
-	"github.com/beego/wetalk/routers/api"
-	"github.com/beego/wetalk/routers/article"
-	"github.com/beego/wetalk/routers/attachment"
-	"github.com/beego/wetalk/routers/auth"
-	"github.com/beego/wetalk/routers/base"
-	"github.com/beego/wetalk/routers/post"
-	"github.com/beego/wetalk/setting"
+	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/routers/admin"
+	"github.com/EPICPaaS/wetalk/routers/api"
+	"github.com/EPICPaaS/wetalk/routers/article"
+	"github.com/EPICPaaS/wetalk/routers/attachment"
+	"github.com/EPICPaaS/wetalk/routers/auth"
+	"github.com/EPICPaaS/wetalk/routers/base"
+	"github.com/EPICPaaS/wetalk/routers/post"
+	"github.com/EPICPaaS/wetalk/setting"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -160,6 +160,9 @@ func main() {
 	if beego.RunMode == "dev" {
 		beego.Router("/test/:tmpl(mail/.*)", new(base.TestRouter))
 	}
+
+	registerExtendR := new(auth.RegisterExtendRouter)
+	beego.Router("/registerExtend", registerExtendR, "get:Register;post:Register")
 
 	// For all unknown pages.
 	beego.Run()

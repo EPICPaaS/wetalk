@@ -21,8 +21,8 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/beego/i18n"
 
-	"github.com/beego/wetalk/modules/utils"
-	"github.com/beego/wetalk/setting"
+	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/EPICPaaS/wetalk/setting"
 )
 
 // post topic
