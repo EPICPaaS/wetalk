@@ -33,7 +33,7 @@ import (
 	"github.com/astaxie/beego/utils/captcha"
 	"github.com/beego/compress"
 	"github.com/beego/i18n"
-	"github.com/beego/social-auth"
+	social "github.com/beego/social-auth"
 	"github.com/beego/social-auth/apps"
 )
 
@@ -111,6 +111,8 @@ var (
 	// Social Auth
 	GithubAuth *apps.Github
 	GoogleAuth *apps.Google
+	WeiboAuth  *apps.Weibo
+	QQAuth     *apps.QQ
 	SocialAuth *social.SocialAuth
 )
 
@@ -228,11 +230,27 @@ func LoadConfig() *goconfig.ConfigFile {
 	secret = Cfg.MustValue("oauth", "google_client_secret", "your_client_secret")
 	GoogleAuth = apps.NewGoogle(clientId, secret)
 
+	clientId = Cfg.MustValue("oauth", "weibo_client_id", "your_client_id")
+	secret = Cfg.MustValue("oauth", "weibo_client_secret", "your_client_secret")
+	WeiboAuth = apps.NewWeibo(clientId, secret)
+
+	clientId = Cfg.MustValue("oauth", "qq_client_id", "your_client_id")
+	secret = Cfg.MustValue("oauth", "qq_client_secret", "your_client_secret")
+	QQAuth = apps.NewQQ(clientId, secret)
+
 	err = social.RegisterProvider(GithubAuth)
 	if err != nil {
 		beego.Error(err)
 	}
 	err = social.RegisterProvider(GoogleAuth)
+	if err != nil {
+		beego.Error(err)
+	}
+	err = social.RegisterProvider(WeiboAuth)
+	if err != nil {
+		beego.Error(err)
+	}
+	err = social.RegisterProvider(QQAuth)
 	if err != nil {
 		beego.Error(err)
 	}
