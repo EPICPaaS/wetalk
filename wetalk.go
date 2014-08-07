@@ -28,6 +28,7 @@ import (
 	"github.com/EPICPaaS/wetalk/routers/attachment"
 	"github.com/EPICPaaS/wetalk/routers/auth"
 	"github.com/EPICPaaS/wetalk/routers/base"
+	"github.com/EPICPaaS/wetalk/routers/epicaccount"
 	"github.com/EPICPaaS/wetalk/routers/post"
 	"github.com/EPICPaaS/wetalk/setting"
 
@@ -163,6 +164,9 @@ func main() {
 
 	registerExtendR := new(auth.RegisterExtendRouter)
 	beego.Router("/registerExtend", registerExtendR, "get:Register;post:Register")
+
+	epicLogin := new(epicaccount.EpicAccount)
+	beego.Router("/epic_login", epicLogin, "get:Login;post:Login")
 
 	// For all unknown pages.
 	beego.Run()

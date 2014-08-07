@@ -20,6 +20,7 @@ import (
 
 	"github.com/beego/social-auth"
 
+	"fmt"
 	"github.com/EPICPaaS/wetalk/modules/auth"
 	"github.com/EPICPaaS/wetalk/modules/models"
 	"github.com/EPICPaaS/wetalk/modules/utils"
@@ -63,10 +64,10 @@ func OAuthAccess(ctx *context.Context) {
 	if err != nil {
 		beego.Error("OAuthAccess", err)
 	}
-
 	if len(redirect) > 0 {
 		ctx.Redirect(302, redirect)
 	}
+
 }
 
 type SocialAuthRouter struct {
@@ -90,6 +91,7 @@ func (this *SocialAuthRouter) Connect() {
 	}
 
 	var socialType social.SocialType
+	fmt.Println("进行校验")
 	if !this.canConnect(&socialType) {
 		this.Redirect(setting.SocialAuth.LoginURL, 302)
 		return

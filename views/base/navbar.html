@@ -39,8 +39,9 @@
                     </ul>
                 </li>
                 {{else}}
-                <li class="dropdown{{if .IsLoginPage}} active{{end}}">
-                    <a href="{{.AppUrl}}login" class="dropdown-toggle" data-toggle="dropdown">{{i18n .Lang "auth.login"}}</a>
+            <!--    <li class="dropdown{{if .IsLoginPage}} active{{end}}">-->
+				    <li>
+                    <a href="{{.AccountCenter}}/login?epic_sub_site={{.AppUrl}}" >{{i18n .Lang "auth.login"}}</a>
                     <form id="dropdown-login" class="dropdown-menu cell" action="{{.AppUrl}}login" method="POST">
                         {{.xsrf_html}}{{.once_html}}
                         <div class="alert alert-info alert-small">

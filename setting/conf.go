@@ -88,6 +88,9 @@ var (
 	MailHost     string
 	MailAuthUser string
 	MailAuthPass string
+
+	//account_center
+	AccountCenterUrl string
 )
 
 var (
@@ -254,6 +257,9 @@ func LoadConfig() *goconfig.ConfigFile {
 	if err != nil {
 		beego.Error(err)
 	}
+
+	//AccountCenter
+	AccountCenterUrl = Cfg.MustValue("account_center", "url", "account.epicpaas.com")
 
 	settingLocales()
 	settingCompress()

@@ -68,15 +68,18 @@ func (this *BaseRouter) Prepare() {
 		this.EndFlashRedirect()
 	}
 
-	switch {
-	// save logined user if exist in session
-	case auth.GetUserFromSession(&this.User, this.CruSession):
-		this.IsLogin = true
-	// save logined user if exist in remember cookie
-	case auth.LoginUserFromRememberCookie(&this.User, this.Ctx):
-		this.IsLogin = true
-	}
-
+	//判断是否已经登陆
+	this.IsLogin = auth.GetUserFromCookie(&this.User, this.Ctx)
+	/*
+		switch {
+		// save logined user if exist in session
+		case auth.GetUserFromSession(&this.User, this.CruSession):
+			this.IsLogin = true
+		// save logined user if exist in remember cookie
+		case auth.LoginUserFromRememberCookie(&this.User, this.Ctx):
+			this.IsLogin = true
+		}
+	*/
 	if this.IsLogin {
 		this.IsLogin = true
 		this.Data["User"] = &this.User
@@ -100,11 +103,12 @@ func (this *BaseRouter) Prepare() {
 	this.Data["SearchEnabled"] = setting.SearchEnabled
 	this.Data["NativeSearch"] = setting.NativeSearch
 	this.Data["SphinxEnabled"] = setting.SphinxEnabled
-
+	this.Data["AccountCenter"] = "http://" + setting.AccountCenterUrl
 	// Redirect to make URL clean.
 	if this.setLang() {
 		i := strings.Index(this.Ctx.Request.RequestURI, "?")
 		this.Redirect(this.Ctx.Request.RequestURI[:i], 302)
+
 		return
 	}
 
@@ -216,7 +220,7 @@ func (this *BaseRouter) CheckLoginRedirect(args ...interface{}) bool {
 			}
 			redirect_to = fmt.Sprintf("%s://%s%s", scheme, req.Host, req.RequestURI)
 		}
-		redirect_to = "/login?to=" + url.QueryEscape(redirect_to)
+		redirect_to = "http://" + setting.AccountCenterUrl + "/login?epic_sub_site=" + url.QueryEscape(redirect_to)
 		this.Redirect(redirect_to, code)
 		return true
 	}

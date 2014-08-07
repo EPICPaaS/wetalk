@@ -18,23 +18,25 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/astaxie/beego/context"
+	"io/ioutil"
+	"strconv"
 	"strings"
-	// "time"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/session"
 
+	"encoding/json"
 	"github.com/EPICPaaS/wetalk/modules/models"
 	"github.com/EPICPaaS/wetalk/modules/utils"
 	"github.com/EPICPaaS/wetalk/setting"
+	"net/http"
 )
 
 // CanRegistered checks if the username or e-mail is available.
 func CanRegistered(userName string, email string) (bool, bool, error) {
 	cond := orm.NewCondition()
 	cond = cond.Or("UserName", userName).Or("Email", email)
-
 	var maps []orm.Params
 	o := orm.NewOrm()
 	n, err := o.QueryTable("user").SetCond(cond).Values(&maps, "UserName", "Email")
@@ -197,6 +199,66 @@ func GetUserFromSession(user *models.User, sess session.SessionStore) bool {
 	}
 
 	return false
+}
+
+type VerifyTokenResult struct {
+	Succeed  bool   `json:"succeed"`
+	Userid   string `json:"userid"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
+//判断用户是否登陆获取用户信息
+func GetUserFromCookie(user *models.User, ctx *context.Context) bool {
+
+	token := ctx.GetCookie("epic_user_token")
+	if len(token) == 0 {
+		return false
+	}
+	result := VerifyToken(token)
+	if !result.Succeed {
+		return false
+	}
+	userNew := models.User{}
+	userid, err := strconv.Atoi(result.Userid)
+	if err != nil {
+		fmt.Println("用户Id转换出错了:" + err.Error())
+	}
+	userNew.Id = userid
+	err = userNew.Read("Id")
+	if err == nil {
+		*user = userNew
+		return true
+	} else {
+		fmt.Println("获取用户信息失败-" + err.Error())
+	}
+	return false
+
+}
+
+func VerifyToken(token string) VerifyTokenResult {
+	result := VerifyTokenResult{}
+	url := "http://" + setting.AccountCenterUrl + "/verify_token?token=" + token
+	resp, err := http.Get(url)
+	if err != nil || resp.StatusCode != 200 {
+		fmt.Println("token校验失败")
+		return result
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	json.Unmarshal(body, &result)
+	return result
+}
+
+func DestroyToken(token string) bool {
+	url := "http://" + setting.AccountCenterUrl + "/logout?token=" + token
+	resp, err := http.Get(url)
+	if err != nil || resp.StatusCode != 200 {
+		fmt.Println("token销毁失败")
+		return false
+	} else {
+		return true
+	}
 }
 
 // verify username/email and password

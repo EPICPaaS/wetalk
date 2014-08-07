@@ -55,7 +55,6 @@ func (this *PostListRouter) postsFilter(qs orm.QuerySeter) orm.QuerySeter {
 func (this *PostListRouter) Home() {
 	this.Data["IsHome"] = true
 	this.TplNames = "post/home.html"
-
 	var cats []models.Category
 	this.setCategories(&cats)
 

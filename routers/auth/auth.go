@@ -120,11 +120,9 @@ ajaxError:
 // Logout implemented user logout page.
 func (this *LoginRouter) Logout() {
 	auth.LogoutUser(this.Ctx)
-
-	// write flash message
-	this.FlashWrite("HasLogout", "true")
-
-	this.Redirect("/login", 302)
+	token := this.Ctx.GetCookie("epic_user_token")
+	auth.DestroyToken(token)
+	this.Redirect("/", 302)
 }
 
 // RegisterRouter serves register page.
