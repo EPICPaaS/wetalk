@@ -88,7 +88,7 @@ func (m *User) Insert() error {
 	fmt.Println(m.Id)
 
 	o := orm.NewOrm()
-	num, err := o.QueryTable("user").Filter("email", m.Email).Update(orm.Params{
+	o.QueryTable("user").Filter("email", m.Email).Update(orm.Params{
 		"id": id,
 	})
 
