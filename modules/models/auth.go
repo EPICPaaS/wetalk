@@ -70,10 +70,30 @@ type User struct {
 }
 
 func (m *User) Insert() error {
+
+	id := m.Id
+
+	//fmt.Println("id...")
+	//fmt.Println(m.Id)
+
+	//orm.Debug = true
 	m.Rands = GetUserSalt()
+
 	if _, err := orm.NewOrm().Insert(m); err != nil {
+
 		return err
 	}
+
+	fmt.Println(m.Email)
+	fmt.Println(m.Id)
+
+	o := orm.NewOrm()
+	num, err := o.QueryTable("user").Filter("email", m.Email).Update(orm.Params{
+		"id": id,
+	})
+
+	//fmt.Printf("Affected Num: %s, %s", num, err)
+
 	return nil
 }
 

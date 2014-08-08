@@ -212,6 +212,7 @@ type VerifyTokenResult struct {
 func GetUserFromCookie(user *models.User, ctx *context.Context) bool {
 
 	token := ctx.GetCookie("epic_user_token")
+
 	if len(token) == 0 {
 		return false
 	}
@@ -224,13 +225,16 @@ func GetUserFromCookie(user *models.User, ctx *context.Context) bool {
 	if err != nil {
 		fmt.Println("用户Id转换出错了:" + err.Error())
 	}
+
+	fmt.Println(result.Userid)
+
 	userNew.Id = userid
 	err = userNew.Read("Id")
 	if err == nil {
 		*user = userNew
 		return true
 	} else {
-		fmt.Println("获取用户信息失败-" + err.Error())
+		fmt.Println("获取用户信息失败 -" + err.Error())
 	}
 	return false
 
@@ -246,6 +250,7 @@ func VerifyToken(token string) VerifyTokenResult {
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
+
 	json.Unmarshal(body, &result)
 	return result
 }
