@@ -97,6 +97,8 @@ func (this *BaseRouter) Prepare() {
 	this.Data["AppName"] = setting.AppName
 	this.Data["AppVer"] = setting.AppVer
 	this.Data["AppUrl"] = setting.AppUrl
+	this.Data["SaaSAppUrl"] = setting.SaaSAppUrl
+	//fmt.Println(setting.SaaSAppUrl)
 	this.Data["AppLogo"] = setting.AppLogo
 	this.Data["AvatarURL"] = setting.AvatarURL
 	this.Data["IsProMode"] = setting.IsProMode

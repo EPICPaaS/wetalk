@@ -46,6 +46,7 @@ var (
 	AppVer              string
 	AppHost             string
 	AppUrl              string
+	SaaSAppUrl          string
 	AppLogo             string
 	EnforceRedirect     bool
 	AvatarURL           string
@@ -272,6 +273,8 @@ func LoadConfig() *goconfig.ConfigFile {
 func reloadConfig() {
 	AppName = Cfg.MustValue("app", "app_name", "WeTalk Community")
 	beego.AppName = AppName
+
+	SaaSAppUrl = Cfg.MustValue("app", "saasapp_url", "http://127.0.0.1")
 
 	AppHost = Cfg.MustValue("app", "app_host", "127.0.0.1:8092")
 	AppUrl = Cfg.MustValue("app", "app_url", "http://127.0.0.1:8092/")
