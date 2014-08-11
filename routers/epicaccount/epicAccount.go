@@ -40,7 +40,8 @@ func (this *EpicAccount) Login() {
 			fmt.Println("找不到用户 userId - " + result.Userid)
 			userNew.UserName = result.Username
 			userNew.Email = result.Email
-			fmt.Println(userNew.Id)
+			userNew.IsActive = true
+			//fmt.Println(userNew.Id)
 
 			err = userNew.Insert()
 
