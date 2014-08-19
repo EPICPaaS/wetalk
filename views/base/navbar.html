@@ -28,6 +28,9 @@
             </ul>
             <ul class="nav navbar-nav navbar-right navbar-menu">
                 {{if .IsLogin}}
+				  <li>
+						<a>你好，{{.User.UserName}}</a>
+				  </li>
                 <li class="dropdown avatar">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><img class="middle" src="{{.AvatarURL}}{{.User.GrEmail}}?size=48"></a>
                     <ul class="dropdown-menu">
