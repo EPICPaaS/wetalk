@@ -18,25 +18,33 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/astaxie/beego/context"
+	"image/gif"
+	"image/jpeg"
+	"image/png"
+	"io"
 	"io/ioutil"
-	"strconv"
+	"path/filepath"
 	"strings"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/session"
+	"github.com/beego/i18n"
 
 	"encoding/json"
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/utils"
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/utils"
+	"github.com/beego/wetalk/setting"
+	qio "github.com/qiniu/api/io"
 	"net/http"
+	"strconv"
 )
 
 // CanRegistered checks if the username or e-mail is available.
 func CanRegistered(userName string, email string) (bool, bool, error) {
 	cond := orm.NewCondition()
 	cond = cond.Or("UserName", userName).Or("Email", email)
+
 	var maps []orm.Params
 	o := orm.NewOrm()
 	n, err := o.QueryTable("user").SetCond(cond).Values(&maps, "UserName", "Email")
@@ -79,7 +87,7 @@ func HasUser(user *models.User, username string) bool {
 }
 
 // register create user
-func RegisterUser(user *models.User, username, email, password string) error {
+func RegisterUser(user *models.User, username, email, password string, locale i18n.Locale) error {
 	// use random salt encode password
 	salt := models.GetUserSalt()
 	pwd := utils.EncodePassword(password, salt)
@@ -96,9 +104,15 @@ func RegisterUser(user *models.User, username, email, password string) error {
 	// Use username as default nickname.
 	user.NickName = user.UserName
 
-	//设置用户默认激活
-	user.IsActive = true
+	//set default language
+	if locale.Lang == "en-US" {
+		user.Lang = setting.LangEnUS
+	} else {
+		user.Lang = setting.LangZhCN
+	}
 
+	//set default avatar
+	user.AvatarType = setting.AvatarTypeGravatar
 	return user.Insert()
 }
 
@@ -107,6 +121,12 @@ func SaveNewPassword(user *models.User, password string) error {
 	salt := models.GetUserSalt()
 	user.Password = fmt.Sprintf("%s$%s", salt, utils.EncodePassword(password, salt))
 	return user.Update("Password", "Rands", "Updated")
+}
+
+//set a new avatar type to user
+func SaveAvatarType(user *models.User, avatarType int) error {
+	user.AvatarType = avatarType
+	return user.Update("AvatarType", "Updated")
 }
 
 // get login redirect url from cookie
@@ -199,71 +219,6 @@ func GetUserFromSession(user *models.User, sess session.SessionStore) bool {
 	}
 
 	return false
-}
-
-type VerifyTokenResult struct {
-	Succeed  bool   `json:"succeed"`
-	Userid   string `json:"userid"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-}
-
-//判断用户是否登陆获取用户信息
-func GetUserFromCookie(user *models.User, ctx *context.Context) bool {
-
-	token := ctx.GetCookie("epic_user_token")
-
-	if len(token) == 0 {
-		return false
-	}
-	result := VerifyToken(token)
-	if !result.Succeed {
-		return false
-	}
-	userNew := models.User{}
-	userid, err := strconv.Atoi(result.Userid)
-	if err != nil {
-		fmt.Println("用户Id转换出错了:" + err.Error())
-	}
-
-	fmt.Println(result.Userid)
-
-	userNew.Id = userid
-	err = userNew.Read("Id")
-	if err == nil {
-		*user = userNew
-		return true
-	} else {
-		fmt.Println("获取用户信息失败 -" + err.Error())
-	}
-	return false
-
-}
-
-func VerifyToken(token string) VerifyTokenResult {
-	result := VerifyTokenResult{}
-	url := "http://" + setting.AccountCenterUrl + "/verify_token?token=" + token
-	resp, err := http.Get(url)
-	if err != nil || resp.StatusCode != 200 {
-		fmt.Println("token校验失败")
-		return result
-	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	json.Unmarshal(body, &result)
-	return result
-}
-
-func DestroyToken(token string) bool {
-	url := "http://" + setting.AccountCenterUrl + "/logout?token=" + token
-	resp, err := http.Get(url)
-	if err != nil || resp.StatusCode != 200 {
-		fmt.Println("token销毁失败")
-		return false
-	} else {
-		return true
-	}
 }
 
 // verify username/email and password
@@ -375,4 +330,144 @@ func CreateUserResetPwdCode(user *models.User, startInf interface{}) string {
 	// add tail hex username
 	code += hex.EncodeToString([]byte(user.UserName))
 	return code
+}
+
+//upload user avatar
+func UploadUserAvatarToQiniu(r io.ReadSeeker, filename string, mime string, bucketName string, user *models.User) error {
+	var ext string
+
+	// test image mime type
+	switch mime {
+	case "image/jpeg":
+		ext = ".jpg"
+
+	case "image/png":
+		ext = ".png"
+
+	case "image/gif":
+		ext = ".gif"
+
+	default:
+		ext = filepath.Ext(filename)
+		switch ext {
+		case ".jpg", ".png", ".gif":
+		default:
+			return fmt.Errorf("unsupport image format `%s`", filename)
+		}
+	}
+
+	// decode image
+	var err error
+	switch ext {
+	case ".jpg":
+		_, err = jpeg.Decode(r)
+	case ".png":
+		_, err = png.Decode(r)
+	case ".gif":
+		_, err = gif.Decode(r)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	//reset reader pointer
+	if _, err := r.Seek(0, 0); err != nil {
+		return err
+	}
+	var data []byte
+	if data, err = ioutil.ReadAll(r); err != nil {
+		return err
+	}
+
+	if len(data) > setting.AvatarImageMaxLength {
+		return fmt.Errorf("avatar image size too large", filename)
+	}
+
+	//reset reader pointer again
+	if _, err := r.Seek(0, 0); err != nil {
+		return err
+	}
+
+	//save to qiniu
+	var uptoken = utils.GetQiniuUptoken(bucketName)
+	var putRet qio.PutRet
+	var putExtra = &qio.PutExtra{
+		MimeType: mime,
+	}
+
+	err = qio.PutWithoutKey(nil, &putRet, uptoken, r, putExtra)
+	if err != nil {
+		return err
+	}
+
+	//update user
+	user.AvatarKey = putRet.Key
+	if err := user.Update("AvatarKey", "Updated"); err != nil {
+		return err
+	}
+	return nil
+}
+
+type VerifyTokenResult struct {
+	Succeed  bool   `json:"succeed"`
+	Userid   string `json:"userid"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
+//判断用户是否登陆获取用户信息
+func GetUserFromCookie(user *models.User, ctx *context.Context) bool {
+
+	token := ctx.GetCookie("epic_user_token")
+
+	if len(token) == 0 {
+		return false
+	}
+	result := VerifyToken(token)
+	if !result.Succeed {
+		return false
+	}
+	userNew := models.User{}
+	userid, err := strconv.Atoi(result.Userid)
+	if err != nil {
+		fmt.Println("用户Id转换出错了:" + err.Error())
+	}
+
+	userNew.Id = userid
+	err = userNew.Read("Id")
+	if err == nil {
+		*user = userNew
+		return true
+	} else {
+		fmt.Println("获取用户信息失败 -" + err.Error())
+	}
+	return false
+
+}
+
+func VerifyToken(token string) VerifyTokenResult {
+	result := VerifyTokenResult{}
+	url := "http://" + setting.AccountCenterUrl + "/verify_token?token=" + token
+	resp, err := http.Get(url)
+	if err != nil || resp.StatusCode != 200 {
+		fmt.Println("token校验失败")
+		return result
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	json.Unmarshal(body, &result)
+	return result
+}
+
+func DestroyToken(token string) bool {
+	url := "http://" + setting.AccountCenterUrl + "/logout?token=" + token
+	resp, err := http.Get(url)
+	if err != nil || resp.StatusCode != 200 {
+		fmt.Println("token销毁失败")
+		return false
+	} else {
+		return true
+	}
 }

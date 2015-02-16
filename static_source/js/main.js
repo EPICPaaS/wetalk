@@ -103,34 +103,6 @@
 		});
 	})();
 
-	// for ajax dropdown login
-	$(document).on('submit', '#dropdown-login', function(){
-		var $form = $(this);
-		var $alert = $form.find('.alert');
-		var url = $form.attr('action');
-		var data = $form.find('input').fieldSerialize();
-		if($.trim($form.find("[name=UserName]").val()) === '' ||
-			$.trim($form.find("[name=Password]").val()) === '') {
-			$form.shake();
-			return false;
-		}
-		$.post(url, data, function(data){
-			$alert.removeClass('alert-info alert-danger');
-			$alert.text(data.message);
-			if(data.success){
-				$alert.addClass('alert-success');
-				setTimeout(function(){
-					window.location.reload();
-				});
-			}else{
-				$alert.addClass('alert-danger');
-				$form.shake();
-			}
-		});
-		return false;
-	});
-
-
 	// file upload
 	(function(){
 		function uploadFileChange($e, $file, $field, flag){
@@ -295,6 +267,25 @@
 				}
 			});
 		}
-	});
+	}); 
 
+	$(document).ready(function(){
+		//scroll top
+		$(window).bind("scroll", function(){
+	      var scrollTopNum = $(document).scrollTop(),
+	          winHeight = $(window).height(),
+	          returnTop = $("div.return-top");
+
+	      (scrollTopNum > 0) ? returnTop.fadeIn("fast") : returnTop.fadeOut("fast");
+
+	      if (!-[1,]&&!window.XMLHttpRequest) {
+	          returnTop.css("top", scrollTopNum + winHeight - 200);
+	      }
+
+		});
+
+		$("div.return-top").click(function() {
+		      $("html, body").animate({ scrollTop: 0 }, 100);
+		});
+	});
 })(jQuery);

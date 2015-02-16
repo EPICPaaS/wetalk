@@ -20,12 +20,11 @@ import (
 
 	"github.com/beego/social-auth"
 
-	"fmt"
-	"github.com/EPICPaaS/wetalk/modules/auth"
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/utils"
-	"github.com/EPICPaaS/wetalk/routers/base"
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/modules/auth"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/utils"
+	"github.com/beego/wetalk/routers/base"
+	"github.com/beego/wetalk/setting"
 )
 
 type socialAuther struct {
@@ -64,10 +63,10 @@ func OAuthAccess(ctx *context.Context) {
 	if err != nil {
 		beego.Error("OAuthAccess", err)
 	}
+
 	if len(redirect) > 0 {
 		ctx.Redirect(302, redirect)
 	}
-
 }
 
 type SocialAuthRouter struct {
@@ -91,7 +90,6 @@ func (this *SocialAuthRouter) Connect() {
 	}
 
 	var socialType social.SocialType
-	fmt.Println("进行校验")
 	if !this.canConnect(&socialType) {
 		this.Redirect(setting.SocialAuth.LoginURL, 302)
 		return
@@ -163,7 +161,7 @@ func (this *SocialAuthRouter) ConnectPost() {
 		}
 
 	default:
-		if err := auth.RegisterUser(&user, formR.UserName, formR.Email, formR.Password); err == nil {
+		if err := auth.RegisterUser(&user, formR.UserName, formR.Email, formR.Password, this.Locale); err == nil {
 
 			auth.SendRegisterMail(this.Locale, &user)
 

@@ -2,8 +2,8 @@
 {{template "admin/base/base_common.html" .}}
 {{define "meta"}}<title>{{i18n .Lang "admin.admin_console"}} - {{i18n .Lang "app_name"}}</title>{{end}}
 {{define "body"}}
-<div class="row">
-    <div id="content">
+<div id="row">
+    <div class="content">
         <div class="col-md-2">
             {{template "admin/sidenav.html" .}}
         </div>

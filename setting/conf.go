@@ -33,12 +33,12 @@ import (
 	"github.com/astaxie/beego/utils/captcha"
 	"github.com/beego/compress"
 	"github.com/beego/i18n"
-	social "github.com/beego/social-auth"
+	"github.com/beego/social-auth"
 	"github.com/beego/social-auth/apps"
 )
 
 const (
-	APP_VER = "0.1.0.1114"
+	APP_VER = "1.3.0.0"
 )
 
 var (
@@ -46,7 +46,6 @@ var (
 	AppVer              string
 	AppHost             string
 	AppUrl              string
-	SaaSAppUrl          string
 	AppLogo             string
 	EnforceRedirect     bool
 	AvatarURL           string
@@ -75,13 +74,6 @@ var (
 
 	// search
 	SearchEnabled bool
-	NativeSearch  bool
-
-	// sphinx search setting
-	SphinxEnabled bool
-	SphinxHost    string
-	SphinxIndex   string
-	SphinxMaxConn int
 
 	// mail setting
 	MailUser     string
@@ -106,17 +98,50 @@ var (
 	QQClientSecret     string
 )
 
+var (
+	QiniuServiceEnabled bool
+	QiniuAccessKey      string
+	QiniuSecurityKey    string
+	QiniuPostBucket     string
+	QiniuPostDomain     string
+	QiniuAvatarBucket   string
+	QiniuAvatarDomain   string
+)
+
+var (
+	PostCountPerPage int
+)
+
 const (
 	LangEnUS = iota
 	LangZhCN
+)
+
+const (
+	BULLETIN_FRIEND_LINK = iota
+	BULLETIN_NEW_COMER
+	BULLETIN_OPEN_SOURCE
+	BULLETIN_MOBILE_APP
+)
+
+const (
+	AvatarImageMaxLength   = 500 * 1024
+	AvatarTypeGravatar     = 1
+	AvatarTypePersonalized = 2
+)
+
+const (
+	NOTICE_TYPE_COMMENT   = 1
+	NOTICE_TYPE_FAVOURITE = 2
+
+	NOTICE_UNREAD = 1
+	NOTICE_READ   = 2
 )
 
 var (
 	// Social Auth
 	GithubAuth *apps.Github
 	GoogleAuth *apps.Google
-	WeiboAuth  *apps.Weibo
-	QQAuth     *apps.QQ
 	SocialAuth *social.SocialAuth
 )
 
@@ -130,6 +155,10 @@ var (
 	GlobalConfPath   = "conf/global/app.ini"
 	AppConfPath      = "conf/app.ini"
 	CompressConfPath = "conf/compress.json"
+)
+
+var (
+	DefaultLang = LangZhCN
 )
 
 // LoadConfig loads configuration file.
@@ -172,9 +201,6 @@ func LoadConfig() *goconfig.ConfigFile {
 	beego.HttpPort = Cfg.MustInt("app", "http_port")
 
 	IsProMode = beego.RunMode == "pro"
-	if IsProMode {
-		beego.SetLevel(beego.LevelInfo)
-	}
 
 	// cache system
 	Cache, err = cache.NewCache("memory", `{"interval":360}`)
@@ -214,13 +240,6 @@ func LoadConfig() *goconfig.ConfigFile {
 
 	reloadConfig()
 
-	if SphinxEnabled {
-		// for search config
-		SphinxHost = Cfg.MustValue("search", "sphinx_host", "127.0.0.1:9306")
-		SphinxMaxConn = Cfg.MustInt("search", "sphinx_max_conn", 5)
-		orm.RegisterDriver("sphinx", orm.DR_MySQL)
-	}
-
 	social.DefaultAppUrl = AppUrl
 
 	// OAuth
@@ -234,14 +253,6 @@ func LoadConfig() *goconfig.ConfigFile {
 	secret = Cfg.MustValue("oauth", "google_client_secret", "your_client_secret")
 	GoogleAuth = apps.NewGoogle(clientId, secret)
 
-	clientId = Cfg.MustValue("oauth", "weibo_client_id", "your_client_id")
-	secret = Cfg.MustValue("oauth", "weibo_client_secret", "your_client_secret")
-	WeiboAuth = apps.NewWeibo(clientId, secret)
-
-	clientId = Cfg.MustValue("oauth", "qq_client_id", "your_client_id")
-	secret = Cfg.MustValue("oauth", "qq_client_secret", "your_client_secret")
-	QQAuth = apps.NewQQ(clientId, secret)
-
 	err = social.RegisterProvider(GithubAuth)
 	if err != nil {
 		beego.Error(err)
@@ -250,17 +261,6 @@ func LoadConfig() *goconfig.ConfigFile {
 	if err != nil {
 		beego.Error(err)
 	}
-	err = social.RegisterProvider(WeiboAuth)
-	if err != nil {
-		beego.Error(err)
-	}
-	err = social.RegisterProvider(QQAuth)
-	if err != nil {
-		beego.Error(err)
-	}
-
-	//AccountCenter
-	AccountCenterUrl = Cfg.MustValue("account_center", "url", "account.epicpaas.com")
 
 	settingLocales()
 	settingCompress()
@@ -273,8 +273,6 @@ func LoadConfig() *goconfig.ConfigFile {
 func reloadConfig() {
 	AppName = Cfg.MustValue("app", "app_name", "WeTalk Community")
 	beego.AppName = AppName
-
-	SaaSAppUrl = Cfg.MustValue("app", "saasapp_url", "http://127.0.0.1")
 
 	AppHost = Cfg.MustValue("app", "app_host", "127.0.0.1:8092")
 	AppUrl = Cfg.MustValue("app", "app_url", "http://127.0.0.1:8092/")
@@ -335,15 +333,7 @@ func reloadConfig() {
 	orm.Debug = Cfg.MustBool("orm", "debug_log")
 
 	// search setting
-	SphinxIndex = Cfg.MustValue("search", "sphinx_index", "wetalk, wetalk_delta")
-
 	SearchEnabled = Cfg.MustBool("search", "enabled")
-	SphinxEnabled = Cfg.MustBool("search", "sphinx_enabled")
-	NativeSearch = Cfg.MustBool("search", "native_search")
-	if !SearchEnabled {
-		SphinxEnabled = false
-		NativeSearch = false
-	}
 
 	// OAuth
 	GithubClientId = Cfg.MustValue("oauth", "github_client_id", "your_client_id")
@@ -354,13 +344,26 @@ func reloadConfig() {
 	WeiboClientSecret = Cfg.MustValue("oauth", "weibo_client_secret", "your_client_secret")
 	QQClientId = Cfg.MustValue("oauth", "qq_client_id", "your_client_id")
 	QQClientSecret = Cfg.MustValue("oauth", "qq_client_secret", "your_client_secret")
+
+	//AccountCenter
+	AccountCenterUrl = Cfg.MustValue("account_center", "url", "account.yopyun.com")
+
+	//Qiniu
+	QiniuServiceEnabled = Cfg.MustBool("qiniu", "qiniu_service_enabled", false)
+	QiniuAccessKey = Cfg.MustValue("qiniu", "qiniu_access_key")
+	QiniuSecurityKey = Cfg.MustValue("qiniu", "qiniu_security_key")
+	QiniuPostBucket = Cfg.MustValue("qiniu", "qiniu_post_bucket")
+	QiniuPostDomain = Cfg.MustValue("qiniu", "qiniu_post_domain")
+	QiniuAvatarBucket = Cfg.MustValue("qiniu", "qiniu_avatar_bucket")
+	QiniuAvatarDomain = Cfg.MustValue("qiniu", "qiniu_avatar_domain")
+
+	//post
+	PostCountPerPage = Cfg.MustInt("post", "post_count_per_page", 20)
 }
 
 func settingLocales() {
 	// load locales with locale_LANG.ini files
-	//	langs := "en-US|zh-CN"
-	//默认设置为中文
-	langs := "zh-CN"
+	langs := "en-US|zh-CN"
 	for _, lang := range strings.Split(langs, "|") {
 		lang = strings.TrimSpace(lang)
 		files := []string{"conf/" + "locale_" + lang + ".ini"}

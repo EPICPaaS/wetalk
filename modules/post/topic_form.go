@@ -17,8 +17,8 @@ package post
 import (
 	"github.com/astaxie/beego/validation"
 
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/utils"
 )
 
 type TopicAdminForm struct {
@@ -26,12 +26,32 @@ type TopicAdminForm struct {
 	Id        int    `form:"-"`
 	Name      string `valid:"Required;MaxSize(30)"`
 	Intro     string `form:"type(textarea)" valid:"Required"`
-	NameZhCn  string `valid:"Required;MaxSize(30)"`
-	IntroZhCn string `form:"type(textarea)" valid:"Required"`
 	Slug      string `valid:"Required;MaxSize(100)"`
-	Followers int    ``
+	Followers int    `form:"-"`
 	Order     int    ``
-	Image     string `valid:""`
+	ImageLink string `valid:"MaxSize(200)"`
+	Category  int    `form:"type(select);attr(rel,select2)" valid:""`
+}
+
+func (form *TopicAdminForm) CategorySelectData() [][]string {
+	var cats []models.Category
+	ListCategories(&cats)
+	data := make([][]string, 0, len(cats))
+	for _, cat := range cats {
+		data = append(data, []string{cat.Name, utils.ToStr(cat.Id)})
+	}
+	return data
+}
+
+func (form *TopicAdminForm) Labels() map[string]string {
+	return map[string]string{
+		"Name":      "model.topic_name",
+		"Intro":     "model.topic_intro",
+		"Slug":      "model.topic_slug",
+		"Order":     "model.topic_order",
+		"ImageLink": "model.topic_image_link",
+		"Category":  "model.category",
+	}
 }
 
 func (form *TopicAdminForm) Valid(v *validation.Validation) {
@@ -41,10 +61,6 @@ func (form *TopicAdminForm) Valid(v *validation.Validation) {
 		v.SetError("Name", "admin.field_need_unique")
 	}
 
-	if models.CheckIsExist(qs, "NameZhCn", form.NameZhCn, form.Id) {
-		v.SetError("NameZhCn", "admin.field_need_unique")
-	}
-
 	if models.CheckIsExist(qs, "Slug", form.Slug, form.Id) {
 		v.SetError("Slug", "admin.field_need_unique")
 	}
@@ -52,10 +68,16 @@ func (form *TopicAdminForm) Valid(v *validation.Validation) {
 
 func (form *TopicAdminForm) SetFromTopic(topic *models.Topic) {
 	utils.SetFormValues(topic, form)
+	form.Category = topic.Category.Id
 }
 
 func (form *TopicAdminForm) SetToTopic(topic *models.Topic) {
 	utils.SetFormValues(form, topic, "Id")
+	if topic.Category != nil {
+		topic.Category.Id = form.Category
+	} else {
+		topic.Category = &models.Category{Id: form.Category}
+	}
 }
 
 type CategoryAdminForm struct {
@@ -64,6 +86,14 @@ type CategoryAdminForm struct {
 	Name   string `valid:"Required;MaxSize(30)"`
 	Slug   string `valid:"Required;MaxSize(100)"`
 	Order  int    ``
+}
+
+func (form *CategoryAdminForm) Labels() map[string]string {
+	return map[string]string{
+		"Name":  "model.category_name",
+		"Slug":  "model.category_slug",
+		"Order": "model.category_order",
+	}
 }
 
 func (form *CategoryAdminForm) Valid(v *validation.Validation) {

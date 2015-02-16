@@ -23,6 +23,11 @@
                         {{i18n .Lang "admin.success_delete"}}
                     </div>
                     {{end}}
+                    {{if .flash.DeleteNotAllowed}}
+                    <div class="alert alert-danger">
+                        {{i18n .Lang "admin.delete_category_not_allowed"}}
+                    </div>
+                    {{end}}
                     <p>
                         <a href="/admin/category/new" class="btn btn-default">{{i18n .Lang "model.new_category"}}</a>
                     </p>

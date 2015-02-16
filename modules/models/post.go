@@ -21,8 +21,8 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/beego/i18n"
 
-	"github.com/EPICPaaS/wetalk/modules/utils"
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/modules/utils"
+	"github.com/beego/wetalk/setting"
 )
 
 // post content
@@ -40,9 +40,11 @@ type Post struct {
 	Topic        *Topic    `orm:"rel(fk)"`
 	Lang         int       `orm:"index"`
 	IsBest       bool      `orm:"index"`
+	CanEdit      bool      `orm:"index"`
 	Category     *Category `orm:"rel(fk)"`
 	Created      time.Time `orm:"auto_now_add"`
 	Updated      time.Time `orm:"auto_now;index"`
+	LastReplied  time.Time `orm:"auto_now;null"`
 }
 
 func (m *Post) Insert() error {
@@ -81,6 +83,10 @@ func (m *Post) Link() string {
 	return fmt.Sprintf("%spost/%d", setting.AppUrl, m.Id)
 }
 
+func (m *Post) Path() string {
+	return fmt.Sprintf("/post/%d", m.Id)
+}
+
 func (m *Post) GetContentCache() string {
 	if setting.RealtimeRenderMD {
 		return utils.RenderMarkdown(m.Content)
@@ -109,7 +115,7 @@ type Comment struct {
 	Message      string `orm:"type(text)"`
 	MessageCache string `orm:"type(text)"`
 	Floor        int
-	Status       int
+	Status       int       `orm:"index"`
 	Created      time.Time `orm:"auto_now_add;index"`
 }
 
@@ -160,15 +166,42 @@ func Comments() orm.QuerySeter {
 // user favorite posts
 type FavoritePost struct {
 	Id      int
-	User    *User     `orm:"rel(fk)"`
-	Post    *Post     `orm:"rel(fk)"`
+	User    *User `orm:"rel(fk)"`
+	Post    *Post `orm:"rel(fk)"`
+	IsFav   bool
 	Created time.Time `orm:"auto_now_add"`
+	Updated time.Time `orm:"auto_now"`
 }
 
 func (*FavoritePost) TableUnique() [][]string {
 	return [][]string{
 		[]string{"User", "Post"},
 	}
+}
+
+func (m *FavoritePost) Insert() error {
+	if _, err := orm.NewOrm().Insert(m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *FavoritePost) Read(fields ...string) error {
+	if err := orm.NewOrm().Read(m, fields...); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *FavoritePost) Update(fields ...string) error {
+	if _, err := orm.NewOrm().Update(m, fields...); err != nil {
+		return err
+	}
+	return nil
+}
+
+func FavoritePosts() orm.QuerySeter {
+	return orm.NewOrm().QueryTable("favorite_post")
 }
 
 func init() {

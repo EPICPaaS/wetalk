@@ -17,9 +17,10 @@ package auth
 import (
 	"github.com/astaxie/beego/orm"
 
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/utils"
-	"github.com/EPICPaaS/wetalk/routers/base"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/utils"
+	"github.com/beego/wetalk/routers/base"
+	"github.com/beego/wetalk/setting"
 )
 
 type UserRouter struct {
@@ -51,6 +52,7 @@ func (this *UserRouter) getUser(user *models.User) bool {
 }
 
 func (this *UserRouter) Home() {
+	this.Data["IsUserHomePage"] = true
 	this.TplNames = "user/home.html"
 
 	var user models.User
@@ -58,6 +60,7 @@ func (this *UserRouter) Home() {
 		return
 	}
 
+	//recent posts and comments
 	limit := 5
 
 	var posts []*models.Post
@@ -66,20 +69,34 @@ func (this *UserRouter) Home() {
 	user.RecentPosts().Limit(limit).RelatedSel().All(&posts)
 	user.RecentComments().Limit(limit).RelatedSel().All(&comments)
 
+	this.Data["TheUserPosts"] = posts
+	this.Data["TheUserComments"] = comments
+
+	//follow topics
 	var ftopics []*models.FollowTopic
 	var topics []*models.Topic
-	nums, _ := models.FollowTopics().Filter("User", &user.Id).Limit(8).OrderBy("-Created").RelatedSel("Topic").All(&ftopics, "Topic")
-	if nums > 0 {
-		topics = make([]*models.Topic, 0, nums)
+	ftNums, _ := models.FollowTopics().Filter("User", &user.Id).Limit(8).OrderBy("-Created").RelatedSel("Topic").All(&ftopics, "Topic")
+	if ftNums > 0 {
+		topics = make([]*models.Topic, 0, ftNums)
 		for _, ft := range ftopics {
 			topics = append(topics, ft.Topic)
 		}
 	}
-	this.Data["TheUserTopics"] = topics
-	this.Data["TheUserTopicsMore"] = nums >= 8
+	this.Data["TheUserFollowTopics"] = topics
+	this.Data["TheUserFollowTopicsMore"] = ftNums >= 8
 
-	this.Data["TheUserPosts"] = posts
-	this.Data["TheUserComments"] = comments
+	//favorite posts
+	var favPostIds orm.ParamsList
+	var favPosts []models.Post
+	favNums, _ := user.FavoritePosts().Limit(8).OrderBy("-Created").ValuesFlat(&favPostIds, "Post")
+	if favNums > 0 {
+		qs := models.Posts().Filter("Id__in", favPostIds)
+		qs = qs.OrderBy("-Created").RelatedSel()
+		models.ListObjects(qs, &favPosts)
+	}
+	this.Data["TheUserFavoritePosts"] = favPosts
+	this.Data["TheUserFavoritePostsMore"] = favNums >= 8
+
 }
 
 func (this *UserRouter) Posts() {
@@ -223,8 +240,8 @@ func (this *UserRouter) Followers() {
 	this.Data["TheUserFollowers"] = users
 }
 
-func (this *UserRouter) Favs() {
-	this.TplNames = "user/favs.html"
+func (this *UserRouter) FollowTopics() {
+	this.TplNames = "user/follow-topics.html"
 
 	var user models.User
 	if this.getUser(&user) {
@@ -240,5 +257,27 @@ func (this *UserRouter) Favs() {
 			topics = append(topics, ft.Topic)
 		}
 	}
-	this.Data["TheUserTopics"] = topics
+	this.Data["TheUserFollowTopics"] = topics
+}
+
+func (this *UserRouter) FavoritePosts() {
+	this.TplNames = "user/favorite-posts.html"
+
+	var user models.User
+	if this.getUser(&user) {
+		return
+	}
+
+	var postIds orm.ParamsList
+	var posts []models.Post
+	nums, _ := user.FavoritePosts().OrderBy("-Created").ValuesFlat(&postIds, "Post")
+	if nums > 0 {
+		qs := models.Posts().Filter("Id__in", postIds)
+		cnt, _ := models.CountObjects(qs)
+		pager := this.SetPaginator(setting.PostCountPerPage, cnt)
+		qs = qs.OrderBy("-Created").Limit(setting.PostCountPerPage, pager.Offset()).RelatedSel()
+		models.ListObjects(qs, &posts)
+	}
+
+	this.Data["TheUserFavoritePosts"] = posts
 }

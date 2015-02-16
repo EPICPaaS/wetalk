@@ -1,13 +1,13 @@
 {{template "admin/base/base.html" .}}
 {{template "admin/base/base_common.html" .}}
-{{define "meta"}}<title>{{i18n .Lang "admin.edit_post"}} - {{i18n .Lang "app_name"}}</title>{{end}}
+{{define "meta"}}<title>{{i18n .Lang "model.edit_post"}} - {{i18n .Lang "app_name"}}</title>{{end}}
 {{define "body"}}
 <div class="row">
     <div id="content">
         <div class="col-md-2">
             {{template "admin/sidenav.html" .}}
         </div>
-        <div class="col-md-8">
+        <div class="col-md-10">
             {{if .Error}}
             <div class="alert alert-danger">
                 {{.Error}}

@@ -27,10 +27,10 @@ import (
 	"github.com/astaxie/beego/validation"
 	"github.com/beego/i18n"
 
-	"github.com/EPICPaaS/wetalk/modules/auth"
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/utils"
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/modules/auth"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/utils"
+	"github.com/beego/wetalk/setting"
 )
 
 type NestPreparer interface {
@@ -70,16 +70,7 @@ func (this *BaseRouter) Prepare() {
 
 	//判断是否已经登陆
 	this.IsLogin = auth.GetUserFromCookie(&this.User, this.Ctx)
-	/*
-		switch {
-		// save logined user if exist in session
-		case auth.GetUserFromSession(&this.User, this.CruSession):
-			this.IsLogin = true
-		// save logined user if exist in remember cookie
-		case auth.LoginUserFromRememberCookie(&this.User, this.Ctx):
-			this.IsLogin = true
-		}
-	*/
+
 	if this.IsLogin {
 		this.IsLogin = true
 		this.Data["User"] = &this.User
@@ -97,20 +88,16 @@ func (this *BaseRouter) Prepare() {
 	this.Data["AppName"] = setting.AppName
 	this.Data["AppVer"] = setting.AppVer
 	this.Data["AppUrl"] = setting.AppUrl
-	this.Data["SaaSAppUrl"] = setting.SaaSAppUrl
-	//fmt.Println(setting.SaaSAppUrl)
 	this.Data["AppLogo"] = setting.AppLogo
 	this.Data["AvatarURL"] = setting.AvatarURL
 	this.Data["IsProMode"] = setting.IsProMode
 	this.Data["SearchEnabled"] = setting.SearchEnabled
-	this.Data["NativeSearch"] = setting.NativeSearch
-	this.Data["SphinxEnabled"] = setting.SphinxEnabled
 	this.Data["AccountCenter"] = "http://" + setting.AccountCenterUrl
+
 	// Redirect to make URL clean.
 	if this.setLang() {
 		i := strings.Index(this.Ctx.Request.RequestURI, "?")
 		this.Redirect(this.Ctx.Request.RequestURI[:i], 302)
-
 		return
 	}
 
@@ -121,6 +108,11 @@ func (this *BaseRouter) Prepare() {
 	xsrfToken := this.XsrfToken()
 	this.Data["xsrf_token"] = xsrfToken
 	this.Data["xsrf_html"] = template.HTML(this.XsrfFormHtml())
+
+	// read unread notifications
+	if this.IsLogin {
+		this.Data["UnreadNotificationCount"] = models.GetUnreadNotificationCount(this.User.Id)
+	}
 
 	// if method is GET then auto create a form once token
 	if this.Ctx.Request.Method == "GET" {
@@ -176,10 +168,10 @@ func (this *BaseRouter) CheckActiveRedirect(args ...interface{}) bool {
 		}
 
 		// redirect to active page
-		//if !this.User.IsActive {
-		//	this.FlashRedirect("/settings/profile", code, "NeedActive")
-		//	return true
-		//}
+		if !this.User.IsActive {
+			this.FlashRedirect("/settings/profile", code, "NeedActive")
+			return true
+		}
 	} else {
 		// no need active
 		if this.User.IsActive {
@@ -521,9 +513,10 @@ func (this *BaseRouter) setLang() bool {
 		}
 	}
 
-	// 4. DefaucurLang language is English.
+	// 4. DefaultLang language is Chinese.
 	if len(lang) == 0 {
-		lang = "en-US"
+		//lang = "en-US"
+		lang = "zh-CN"
 		isNeedRedir = false
 	}
 

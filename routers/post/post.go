@@ -15,238 +15,304 @@
 package post
 
 import (
-	"fmt"
-
-	"github.com/astaxie/beego/orm"
-
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/post"
-	"github.com/EPICPaaS/wetalk/modules/utils"
-	"github.com/EPICPaaS/wetalk/routers/base"
+	"github.com/astaxie/beego"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/post"
+	"github.com/beego/wetalk/routers/base"
+	"github.com/beego/wetalk/setting"
 )
 
-// HomeRouter serves home page.
+//Post List Router
+
 type PostListRouter struct {
 	base.BaseRouter
 }
 
+//Get all the categories
 func (this *PostListRouter) setCategories(cats *[]models.Category) {
+	//@see modules/post/topic_util.go
 	post.ListCategories(cats)
 	this.Data["Categories"] = *cats
 }
 
-func (this *PostListRouter) setTopicsOfCat(topics *[]models.Topic, cat *models.Category) {
-	post.ListTopicsOfCat(topics, cat)
-	this.Data["Topics"] = *topics
+//Get all the topics of the category
+func (this *PostListRouter) setTopicsOfCategory(topics *[]models.Topic, category *models.Category) {
+	//@see modules/post/topic_util.go
+	post.ListTopicsOfCategory(topics, category)
+	this.Data["TopicsOfCategory"] = *topics
 }
 
-func (this *PostListRouter) postsFilter(qs orm.QuerySeter) orm.QuerySeter {
-	if !this.IsLogin {
-		return qs
+//Get new best posts
+func (this *PostListRouter) setNewBestPosts(posts *[]models.Post) {
+	qs := models.Posts()
+	qs = qs.Filter("IsBest", true).OrderBy("-Created").Limit(10)
+	models.ListObjects(qs, posts)
+	this.Data["NewBestPosts"] = posts
+}
+
+//Get new best posts by category
+func (this *PostListRouter) setNewBestPostsOfCategory(posts *[]models.Post, cat *models.Category) {
+	qs := models.Posts()
+	qs = qs.Filter("IsBest", true).Filter("Category__id", cat.Id).OrderBy("-Created").Limit(10)
+	models.ListObjects(qs, posts)
+	this.Data["NewBestPosts"] = posts
+}
+
+//Get new best posts by topic
+func (this *PostListRouter) setNewBestPostsOfTopic(posts *[]models.Post, topic *models.Topic) {
+	qs := models.Posts()
+	qs = qs.Filter("IsBest", true).Filter("Topic__id", topic.Id).OrderBy("-Created").Limit(10)
+	models.ListObjects(qs, posts)
+	this.Data["NewBestPosts"] = posts
+}
+
+//Get most replys posts
+func (this *PostListRouter) setMostReplysPosts(posts *[]models.Post) {
+	qs := models.Posts()
+	qs = qs.Filter("Replys__gt", 0).OrderBy("-Created", "-Replys").Limit(10)
+	models.ListObjects(qs, posts)
+	this.Data["MostReplysPosts"] = posts
+}
+
+//Get most replys posts of category
+func (this *PostListRouter) setMostReplysPostsOfCategory(posts *[]models.Post, cat *models.Category) {
+	qs := models.Posts()
+	qs = qs.Filter("Category__id", cat.Id).Filter("Replys__gt", 0).OrderBy("-Created", "-Replys").Limit(10)
+	models.ListObjects(qs, posts)
+	this.Data["MostReplysPosts"] = posts
+}
+
+//Get most replys post of topic
+func (this *PostListRouter) setMostReplysPostsOfTopic(posts *[]models.Post, topic *models.Topic) {
+	qs := models.Posts()
+	qs = qs.Filter("Topic__id", topic.Id).Filter("Replys__gt", 0).OrderBy("-Created", "-Replys").Limit(10)
+	models.ListObjects(qs, posts)
+	this.Data["MostReplysPosts"] = posts
+}
+
+//Get sidebar bulletin information
+func (this *PostListRouter) setSidebarBuilletinInfo() {
+	var bulletins []models.Bulletin
+	qs := models.Bulletins().OrderBy("Created")
+	models.ListObjects(qs, &bulletins)
+
+	var friendLinks []models.Bulletin
+	var newComers []models.Bulletin
+	var mobileApps []models.Bulletin
+	var openSources []models.Bulletin
+
+	for _, bulletin := range bulletins {
+		switch bulletin.Type {
+		case setting.BULLETIN_FRIEND_LINK:
+			friendLinks = append(friendLinks, bulletin)
+		case setting.BULLETIN_NEW_COMER:
+			newComers = append(newComers, bulletin)
+		case setting.BULLETIN_MOBILE_APP:
+			mobileApps = append(mobileApps, bulletin)
+		case setting.BULLETIN_OPEN_SOURCE:
+			openSources = append(openSources, bulletin)
+		}
 	}
-	args := []string{utils.ToStr(this.Locale.Index())}
-	args = append(args, this.User.LangAdds...)
-	args = append(args, utils.ToStr(this.User.Lang))
-	qs = qs.Filter("Lang__in", args)
-	return qs
+	this.Data["FriendLinks"] = friendLinks
+	this.Data["NewComers"] = newComers
+	this.Data["MobileApps"] = mobileApps
+	this.Data["OpenSources"] = openSources
 }
 
-// Get implemented Get method for HomeRouter.
+//Get the home page
 func (this *PostListRouter) Home() {
-	this.Data["IsHome"] = true
 	this.TplNames = "post/home.html"
-	var cats []models.Category
-	this.setCategories(&cats)
 
+	//get posts by Created datetime desc order
 	var posts []models.Post
-	qs := models.Posts().OrderBy("-Created").Limit(25).RelatedSel()
-	qs = this.postsFilter(qs)
+	qs := models.Posts()
+	cnt, _ := models.CountObjects(qs)
+	pager := this.SetPaginator(setting.PostCountPerPage, cnt)
+	qs = qs.OrderBy("-LastReplied").Limit(setting.PostCountPerPage, pager.Offset()).RelatedSel()
 
 	models.ListObjects(qs, &posts)
 	this.Data["Posts"] = posts
 
-	this.Data["CategorySlug"] = "hot"
-
-	var topics []models.Topic
-	post.ListTopics(&topics)
-	this.Data["Topics"] = topics
+	//top nav bar data
+	var cats []models.Category
+	this.setCategories(&cats)
+	this.Data["SortSlug"] = ""
+	this.Data["CategorySlug"] = "home"
+	//new best posts
+	var newBestPosts []models.Post
+	this.setNewBestPosts(&newBestPosts)
+	//most replys posts
+	var mostReplysPosts []models.Post
+	this.setMostReplysPosts(&mostReplysPosts)
+	this.setSidebarBuilletinInfo()
 }
 
-// Get implemented Get method for HomeRouter.
-func (this *PostListRouter) Category() {
-	this.TplNames = "post/category.html"
+func (this *PostListRouter) Navs() {
+	this.TplNames = "post/home.html"
 
+	sortSlug := this.GetString(":sortSlug")
+	var posts []models.Post
+	qs := models.Posts()
+	cnt, _ := models.CountObjects(qs)
+	pager := this.SetPaginator(setting.PostCountPerPage, cnt)
+	switch sortSlug {
+	case "recent":
+		qs = qs.OrderBy("-Created")
+	case "hot":
+		qs = qs.OrderBy("-LastReplied")
+	case "cold":
+		qs = qs.Filter("Replys", 0).OrderBy("-Created")
+	default:
+		this.Abort("404")
+		return
+	}
+	qs = qs.Limit(setting.PostCountPerPage, pager.Offset()).RelatedSel()
+	models.ListObjects(qs, &posts)
+	this.Data["Posts"] = posts
+
+	//top nav bar data
+	var cats []models.Category
+	this.setCategories(&cats)
+	this.Data["SortSlug"] = sortSlug
+	this.Data["CategorySlug"] = "home"
+	//new best posts
+	var newBestPosts []models.Post
+	this.setNewBestPosts(&newBestPosts)
+	//most replys posts
+	var mostReplysPosts []models.Post
+	this.setMostReplysPosts(&mostReplysPosts)
+	this.setSidebarBuilletinInfo()
+}
+
+//Get the posts by category
+func (this *PostListRouter) Category() {
+	this.TplNames = "post/home.html"
+
+	//check category slug
 	slug := this.GetString(":slug")
 	cat := models.Category{Slug: slug}
 	if err := cat.Read("Slug"); err != nil {
 		this.Abort("404")
 		return
 	}
-
-	pers := 25
-
+	//get posts by category slug, order by Created desc
 	qs := models.Posts().Filter("Category", &cat)
-	qs = this.postsFilter(qs)
-
 	cnt, _ := models.CountObjects(qs)
-	pager := this.SetPaginator(pers, cnt)
+	pager := this.SetPaginator(setting.PostCountPerPage, cnt)
+	qs = qs.OrderBy("-LastReplied").Limit(setting.PostCountPerPage, pager.Offset()).RelatedSel()
+	var posts []models.Post
+	models.ListObjects(qs, &posts)
 
-	qs = qs.OrderBy("-Created").Limit(pers, pager.Offset()).RelatedSel()
+	this.Data["Category"] = &cat
+	this.Data["Posts"] = posts
 
+	//top nav bar data
+	var cats []models.Category
+	this.setCategories(&cats)
+	var topics []models.Topic
+	this.setTopicsOfCategory(&topics, &cat)
+	this.Data["CategorySlug"] = cat.Slug
+	this.Data["SortSlug"] = ""
+	var newBestPosts []models.Post
+	this.setNewBestPostsOfCategory(&newBestPosts, &cat)
+	//most replys posts
+	var mostReplysPosts []models.Post
+	this.setMostReplysPostsOfCategory(&mostReplysPosts, &cat)
+	this.setSidebarBuilletinInfo()
+}
+
+func (this *PostListRouter) CatNavs() {
+	this.TplNames = "post/home.html"
+	//check category slug and sort slug
+	catSlug := this.GetString(":catSlug")
+	sortSlug := this.GetString(":sortSlug")
+	cat := models.Category{Slug: catSlug}
+	if err := cat.Read("Slug"); err != nil {
+		this.Abort("404")
+		return
+	}
+	qs := models.Posts().Filter("Category", &cat)
+	cnt, _ := models.CountObjects(qs)
+	pager := this.SetPaginator(setting.PostCountPerPage, cnt)
+	switch sortSlug {
+	case "recent":
+		qs = qs.OrderBy("-Created")
+	case "hot":
+		qs = qs.OrderBy("-LastReplied")
+	case "cold":
+		qs = qs.Filter("Replys", 0).OrderBy("-Created")
+	default:
+		this.Abort("404")
+		return
+	}
+	qs = qs.Limit(setting.PostCountPerPage, pager.Offset()).RelatedSel()
+	var posts []models.Post
+	models.ListObjects(qs, &posts)
+
+	this.Data["Category"] = &cat
+	this.Data["Posts"] = posts
+
+	//top nav bar data
+	var cats []models.Category
+	this.setCategories(&cats)
+	var topics []models.Topic
+	this.setTopicsOfCategory(&topics, &cat)
+	this.Data["CategorySlug"] = cat.Slug
+	this.Data["SortSlug"] = sortSlug
+	var newBestPosts []models.Post
+	this.setNewBestPostsOfCategory(&newBestPosts, &cat)
+	//most replys posts
+	var mostReplysPosts []models.Post
+	this.setMostReplysPostsOfCategory(&mostReplysPosts, &cat)
+	this.setSidebarBuilletinInfo()
+}
+
+//Topic Home Page
+func (this *PostListRouter) Topic() {
+	this.TplNames = "post/topic.html"
+	//check topic slug
+	slug := this.GetString(":slug")
+	topic := models.Topic{Slug: slug}
+	if err := topic.Read("Slug"); err != nil {
+		this.Abort("404")
+		return
+	}
+	//get topic category
+	category := models.Category{Id: topic.Category.Id}
+	if err := category.Read("Id"); err != nil {
+		this.Abort("404")
+		return
+	}
+
+	//get posts by topic
+	qs := models.Posts().Filter("Topic", &topic)
+	cnt, _ := models.CountObjects(qs)
+	pager := this.SetPaginator(setting.PostCountPerPage, cnt)
+	qs = qs.OrderBy("-LastReplied").Limit(setting.PostCountPerPage, pager.Offset()).RelatedSel()
 	var posts []models.Post
 	models.ListObjects(qs, &posts)
 
 	this.Data["Posts"] = posts
-	this.Data["Category"] = &cat
-	this.Data["CategorySlug"] = cat.Slug
-	this.Data["IsCategory"] = true
+	this.Data["Topic"] = &topic
+	this.Data["Category"] = &category
 
-	var cats []models.Category
-	this.setCategories(&cats)
+	//check whether added it into favorite list
+	HasFavorite := false
+	if this.IsLogin {
+		HasFavorite = models.FollowTopics().Filter("User", &this.User).Filter("Topic", &topic).Exist()
+	}
+	this.Data["HasFavorite"] = HasFavorite
 
-	var topics []models.Topic
-	this.setTopicsOfCat(&topics, &cat)
+	//new best post
+	var newBestPosts []models.Post
+	this.setNewBestPostsOfTopic(&newBestPosts, &topic)
+	//most replys posts
+	var mostReplysPosts []models.Post
+	this.setMostReplysPostsOfTopic(&mostReplysPosts, &topic)
+	this.setSidebarBuilletinInfo()
 }
 
-// Get implemented Get method for HomeRouter.
-func (this *PostListRouter) Navs() {
-	slug := this.GetString(":slug")
-
-	switch slug {
-	case "favs", "follow":
-		if this.CheckLoginRedirect() {
-			return
-		}
-	}
-
-	this.Data["CategorySlug"] = slug
-	this.TplNames = fmt.Sprintf("post/navs/%s.html", slug)
-
-	pers := 25
-
-	var posts []models.Post
-
-	switch slug {
-	case "recent":
-		qs := models.Posts()
-		qs = this.postsFilter(qs)
-
-		cnt, _ := models.CountObjects(qs)
-		pager := this.SetPaginator(pers, cnt)
-
-		qs = qs.OrderBy("-Updated").Limit(pers, pager.Offset()).RelatedSel()
-
-		models.ListObjects(qs, &posts)
-
-		var cats []models.Category
-		this.setCategories(&cats)
-
-	case "best":
-		qs := models.Posts().Filter("IsBest", true)
-		qs = this.postsFilter(qs)
-
-		cnt, _ := models.CountObjects(qs)
-		pager := this.SetPaginator(pers, cnt)
-
-		qs = qs.OrderBy("-Created").Limit(pers, pager.Offset()).RelatedSel()
-
-		models.ListObjects(qs, &posts)
-
-		var cats []models.Category
-		this.setCategories(&cats)
-
-	case "cold":
-		qs := models.Posts().Filter("Replys", 0)
-		qs = this.postsFilter(qs)
-
-		cnt, _ := models.CountObjects(qs)
-		pager := this.SetPaginator(pers, cnt)
-
-		qs = qs.OrderBy("-Created").Limit(pers, pager.Offset()).RelatedSel()
-
-		models.ListObjects(qs, &posts)
-
-		var cats []models.Category
-		this.setCategories(&cats)
-
-	case "favs":
-		var topicIds orm.ParamsList
-		nums, _ := models.FollowTopics().Filter("User", &this.User.Id).OrderBy("-Created").ValuesFlat(&topicIds, "Topic")
-		if nums > 0 {
-			qs := models.Posts().Filter("Topic__in", topicIds)
-			qs = this.postsFilter(qs)
-
-			cnt, _ := models.CountObjects(qs)
-			pager := this.SetPaginator(pers, cnt)
-
-			qs = qs.OrderBy("-Created").Limit(pers, pager.Offset()).RelatedSel()
-
-			models.ListObjects(qs, &posts)
-
-			var topics []models.Topic
-			nums, _ = models.Topics().Filter("Id__in", topicIds).Limit(8).All(&topics)
-			this.Data["Topics"] = topics
-			this.Data["TopicsMore"] = nums >= 8
-		}
-
-	case "follow":
-		var userIds orm.ParamsList
-		nums, _ := this.User.FollowingUsers().OrderBy("-Created").ValuesFlat(&userIds, "FollowUser")
-		if nums > 0 {
-			qs := models.Posts().Filter("User__in", userIds)
-			qs = this.postsFilter(qs)
-
-			cnt, _ := models.CountObjects(qs)
-			pager := this.SetPaginator(pers, cnt)
-
-			qs = qs.OrderBy("-Created").Limit(pers, pager.Offset()).RelatedSel()
-
-			models.ListObjects(qs, &posts)
-		}
-	}
-
-	this.Data["Posts"] = posts
-}
-
-// Get implemented Get method for HomeRouter.
-func (this *PostListRouter) Topic() {
-	slug := this.GetString(":slug")
-
-	switch slug {
-	default: // View topic.
-		this.TplNames = "post/topic.html"
-		topic := models.Topic{Slug: slug}
-		if err := topic.Read("Slug"); err != nil {
-			this.Abort("404")
-			return
-		}
-
-		pers := 25
-
-		qs := models.Posts().Filter("Topic", &topic)
-		qs = this.postsFilter(qs)
-
-		cnt, _ := models.CountObjects(qs)
-		pager := this.SetPaginator(pers, cnt)
-
-		qs = qs.OrderBy("-Created").Limit(pers, pager.Offset()).RelatedSel()
-
-		var posts []models.Post
-		models.ListObjects(qs, &posts)
-
-		this.Data["Posts"] = posts
-		this.Data["Topic"] = &topic
-		this.Data["IsTopic"] = true
-
-		HasFavorite := false
-		if this.IsLogin {
-			HasFavorite = models.FollowTopics().Filter("User", &this.User).Filter("Topic", &topic).Exist()
-		}
-		this.Data["HasFavorite"] = HasFavorite
-	}
-}
-
-// Get implemented Get method for HomeRouter.
+// Add this topic into favorite list
 func (this *PostListRouter) TopicSubmit() {
 	slug := this.GetString(":slug")
 
@@ -283,11 +349,12 @@ func (this *PostListRouter) TopicSubmit() {
 	this.ServeJson()
 }
 
+// Post Router
 type PostRouter struct {
 	base.BaseRouter
 }
 
-func (this *PostRouter) New() {
+func (this *PostRouter) NewPost() {
 	this.TplNames = "post/new.html"
 
 	if this.CheckActiveRedirect() {
@@ -295,35 +362,35 @@ func (this *PostRouter) New() {
 	}
 
 	form := post.PostForm{Locale: this.Locale}
-
-	if v := this.Ctx.GetCookie("post_topic"); len(v) > 0 {
-		form.Topic, _ = utils.StrTo(v).Int()
-	}
-
-	if v := this.Ctx.GetCookie("post_cat"); len(v) > 0 {
-		form.Category, _ = utils.StrTo(v).Int()
-	}
-
-	if v := this.Ctx.GetCookie("post_lang"); len(v) > 0 {
-		form.Lang, _ = utils.StrTo(v).Int()
+	topicSlug := this.GetString("topic")
+	if len(topicSlug) > 0 {
+		topic := models.Topic{Slug: topicSlug}
+		err := topic.Read("Slug")
+		if err == nil {
+			form.Topic = topic.Id
+			form.Category = topic.Category.Id
+			post.ListTopicsOfCategory(&form.Topics, &models.Category{Id: form.Category})
+			this.Data["Topic"] = &topic
+		} else {
+			this.Redirect(setting.AppUrl, 302)
+		}
 	} else {
-		form.Lang = this.Locale.Index()
+		catSlug := this.GetString("category")
+		if len(catSlug) > 0 {
+			category := models.Category{Slug: catSlug}
+			category.Read("Slug")
+			form.Category = category.Id
+			post.ListTopicsOfCategory(&form.Topics, &category)
+			this.Data["Category"] = &category
+		} else {
+			this.Redirect(setting.AppUrl, 302)
+		}
 	}
 
-	slug := this.GetString("topic")
-	if len(slug) > 0 {
-		topic := models.Topic{Slug: slug}
-		topic.Read("Slug")
-		form.Topic = topic.Id
-		this.Data["Topic"] = &topic
-	}
-
-	post.ListCategories(&form.Categories)
-	post.ListTopics(&form.Topics)
 	this.SetFormSets(&form)
 }
 
-func (this *PostRouter) NewSubmit() {
+func (this *PostRouter) NewPostSubmit() {
 	this.TplNames = "post/new.html"
 
 	if this.CheckActiveRedirect() {
@@ -331,15 +398,39 @@ func (this *PostRouter) NewSubmit() {
 	}
 
 	form := post.PostForm{Locale: this.Locale}
-	slug := this.GetString("topic")
-	if len(slug) > 0 {
-		topic := models.Topic{Slug: slug}
-		topic.Read("Slug")
-		form.Topic = topic.Id
-		this.Data["Topic"] = &topic
+	topicSlug := this.GetString("topic")
+	if len(topicSlug) > 0 {
+		topic := models.Topic{Slug: topicSlug}
+		err := topic.Read("Slug")
+		if err == nil {
+			form.Category = topic.Category.Id
+			form.Topic = topic.Id
+			this.Data["Topic"] = &topic
+		} else {
+			beego.Error("Can not find topic by slug:", topicSlug)
+		}
+	} else {
+		topicId, err := this.GetInt("Topic")
+		if err == nil {
+			topic := models.Topic{Id: int(topicId)}
+			err = topic.Read("Id")
+			if err == nil {
+				form.Category = topic.Category.Id
+				form.Topic = topic.Id
+				this.Data["Topic"] = &topic
+			} else {
+				beego.Error("Can not find topic by id:", topicId)
+			}
+		} else {
+			beego.Error("Parse param Topic from request failed", err)
+		}
 	}
-
-	post.ListCategories(&form.Categories)
+	if categorySlug := this.GetString("category"); categorySlug != "" {
+		beego.Debug("Find category slug:", categorySlug)
+		category := models.Category{Slug: categorySlug}
+		category.Read("Slug")
+		this.Data["Category"] = &category
+	}
 	post.ListTopics(&form.Topics)
 	if !this.ValidFormSets(&form) {
 		return
@@ -347,11 +438,6 @@ func (this *PostRouter) NewSubmit() {
 
 	var post models.Post
 	if err := form.SavePost(&post, &this.User); err == nil {
-
-		this.Ctx.SetCookie("post_topic", utils.ToStr(form.Topic), 1<<31-1, "/")
-		this.Ctx.SetCookie("post_cat", utils.ToStr(form.Category), 1<<31-1, "/")
-		this.Ctx.SetCookie("post_lang", utils.ToStr(form.Lang), 1<<31-1, "/")
-
 		this.JsStorage("deleteKey", "post/new")
 		this.Redirect(post.Link(), 302)
 	}
@@ -385,7 +471,8 @@ func (this *PostRouter) loadComments(post *models.Post, comments *[]*models.Comm
 	}
 }
 
-func (this *PostRouter) Single() {
+//Post Page
+func (this *PostRouter) SinglePost() {
 	this.TplNames = "post/post.html"
 
 	var postMd models.Post
@@ -396,13 +483,27 @@ func (this *PostRouter) Single() {
 	var comments []*models.Comment
 	this.loadComments(&postMd, &comments)
 
+	//mark all notification as read
+	if this.IsLogin {
+		models.MarkNortificationAsRead(this.User.Id, postMd.Id)
+	}
+
+	//check whether this post is favorited
+	num, _ := this.User.FavoritePosts().Filter("Post__Id", postMd.Id).Filter("IsFav", true).Count()
+	if num != 0 {
+		this.Data["IsPostFav"] = true
+	} else {
+		this.Data["IsPostFav"] = false
+	}
+
 	form := post.CommentForm{}
 	this.SetFormSets(&form)
-
+	//increment PageViewCount
 	post.PostBrowsersAdd(this.User.Id, this.Ctx.Input.IP(), &postMd)
 }
 
-func (this *PostRouter) SingleSubmit() {
+//New Comment
+func (this *PostRouter) SinglePostCommentSubmit() {
 	this.TplNames = "post/post.html"
 
 	if this.CheckActiveRedirect() {
@@ -430,6 +531,7 @@ func (this *PostRouter) SingleSubmit() {
 
 	comment := models.Comment{}
 	if err := form.SaveComment(&comment, &this.User, &postMd); err == nil {
+		post.FilterCommentMentions(&this.User, &postMd, &comment)
 		this.JsStorage("deleteKey", "post/comment")
 		this.Redirect(postMd.Link(), 302)
 		redir = true
@@ -438,7 +540,7 @@ func (this *PostRouter) SingleSubmit() {
 	}
 }
 
-func (this *PostRouter) Edit() {
+func (this *PostRouter) EditPost() {
 	this.TplNames = "post/edit.html"
 
 	if this.CheckActiveRedirect() {
@@ -450,14 +552,16 @@ func (this *PostRouter) Edit() {
 		return
 	}
 
+	//if !postMd.CanEdit {
+	//	this.Redirect(postMd.Link(), 302)
+	//}
 	form := post.PostForm{}
 	form.SetFromPost(&postMd)
-	post.ListCategories(&form.Categories)
 	post.ListTopics(&form.Topics)
 	this.SetFormSets(&form)
 }
 
-func (this *PostRouter) EditSubmit() {
+func (this *PostRouter) EditPostSubmit() {
 	this.TplNames = "post/edit.html"
 
 	if this.CheckActiveRedirect() {
@@ -469,9 +573,12 @@ func (this *PostRouter) EditSubmit() {
 		return
 	}
 
+	if !postMd.CanEdit {
+		this.FlashRedirect(postMd.Path(), 302, "CanNotEditPost")
+	}
+
 	form := post.PostForm{}
 	form.SetFromPost(&postMd)
-	post.ListCategories(&form.Categories)
 	post.ListTopics(&form.Topics)
 	if !this.ValidFormSets(&form) {
 		return

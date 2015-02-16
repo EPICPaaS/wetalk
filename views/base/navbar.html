@@ -12,71 +12,53 @@
             </a>
         </div>
         {{if .SearchEnabled}}
-        <form id="navbar-search" class="navbar-form navbar-left {{if or .NativeSearch .SphinxEnabled}}{{else}}google{{end}}" role="search" action="{{.AppUrl}}search">
+        <form id="navbar-search" class="navbar-form navbar-left" role="search" action="{{.AppUrl}}search" method="GET">
             <div class="form-group">
-                <input class="form-control" type="text" placeholder="{{i18n .Lang "search"}}" name="q" {{if or .NativeSearch .SphinxEnabled}}value="{{.Q}}"{{end}}>
+                <input class="form-control search-box" type="text" placeholder="{{i18n .Lang "search"}}" name="q" id="st-search-input">
             </div>
         </form>
         {{end}}
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                <li {{if .IsHome}}class="active"{{end}}><a href="{{.AppUrl}}">{{i18n .Lang "home"}}</a></li>
-                <li><a target="_blank" href="http://blog.epicpaas.com/">{{i18n .Lang "blog"}}</a></li>
-                <li><a target="_blank" href="http://www.epicpaas.com/">{{i18n .Lang "beego_website"}}</a></li>
-                <li><a target="_blank" href="{{.SaaSAppUrl}}/saasportal">{{i18n .Lang "saasportal"}}</a></li>
-                <li><a target="_blank" href="{{.SaaSAppUrl}}/developer">{{i18n .Lang "developer"}}</a></li>
+                <li><a href="{{.AppUrl}}">{{i18n .Lang "home"}}</a></li>
+                <li><a href="{{.AppUrl}}topic/activity">{{i18n .Lang "activity"}}</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{i18n .Lang "tool"}} <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="http://gopm.io" target="_blank">{{i18n .Lang "gopm"}}</a></li>
+                    </ul>
+                </li>
             </ul>
-            <ul class="nav navbar-nav navbar-right navbar-menu">
-                {{if .IsLogin}}
-				  <li>
-						<a>你好，{{.User.UserName}}</a>
-				  </li>
-                <li class="dropdown avatar">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><img class="middle" src="{{.AvatarURL}}{{.User.GrEmail}}?size=48"></a>
-                    <ul class="dropdown-menu">
+            
+            {{if .IsLogin}}
+            <ul class="nav navbar-nav navbar-right">
+                {{if .UnreadNotificationCount}}
+                <li>
+                    <a href="{{.AppUrl}}notification">{{i18n .Lang "notice.unread_notice"}} <span class="badge" style="vertical-align:top;">{{.UnreadNotificationCount}}</span></span></a>
+                </li>
+                {{end}}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{.User.NickName}} <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="{{.User.Link}}">{{i18n .Lang "nav.user_home_page"}}</a></li>
+                        <li><a href="{{.AppUrl}}notification">{{i18n .Lang "notice.my_notice"}}</a></li>
+                        <li><a href="{{.AppUrl}}settings/profile">{{i18n .Lang "nav.user_setting_page"}}</a></li>
+                        <li class="divider"></li>
                         {{if .User.IsAdmin}}
                             <li><a href="{{.AppUrl}}admin">{{i18n .Lang "admin.admin_center"}}</a></li>
                             <li class="divider"></li>
                         {{end}}
-                        <li><a href="{{.User.Link}}"><span>{{i18n .Lang "user.home"}}</span></a></li>
-                        <li><a href="{{.AppUrl}}settings/profile"><span>{{i18n .Lang "auth.user_profile"}}</span></a></li>
                         <li><a href="{{.AppUrl}}logout">{{i18n .Lang "auth.logout"}}</a></li>
                     </ul>
                 </li>
-                {{else}}
-            <!--    <li class="dropdown{{if .IsLoginPage}} active{{end}}">-->
-				    <li>
-                    <a href="{{.AccountCenter}}/login?epic_sub_site={{.AppUrl}}" >{{i18n .Lang "auth.login"}}</a>
-                    <form id="dropdown-login" class="dropdown-menu cell" action="{{.AppUrl}}login" method="POST">
-                        {{.xsrf_html}}{{.once_html}}
-                        <div class="alert alert-info alert-small">
-                            {{i18n .Lang "auth.login_your_account"}}
-                        </div>
-                        <div class="form-group">
-                            <input class="form-control" name="UserName" type="text" placeholder="{{i18n .Lang "auth.login_username"}} / {{i18n .Lang "auth.login_email"}}" value="">
-                        </div>
-                        <div class="form-group">
-                            <input class="form-control" name="Password" type="password" placeholder="{{i18n .Lang "auth.login_password"}}">
-                        </div>
-                        <p>
-                            <label>
-                                <input type="hidden" name="Remember" value="0">
-                                <button type="button" data-toggle="button" data-name="Remember" value="0" class="btn btn-default btn-xs btn-checked"><i class="icon icon-ok"></i></button>{{i18n .Lang "auth.login_remember_me"}}
-                            </label>
-                            <span class="pull-right"><a href="{{$.AppUrl}}forgot"><i class="icon-question-sign"></i> {{i18n .Lang "auth.forgot_password"}}</a></span>
-                        </p>
-                        <button class="btn btn-primary btn-block" type="submit">{{i18n .Lang "auth.login"}}</button>
-                        <div class="auth-socials">
-                            <a href="{{.AppUrl}}login/google" class="icon-google-plus google"></a>
-                            <a href="{{.AppUrl}}login/github" class="icon-github github"></a>
-                            <a href="{{.AppUrl}}login/weibo" class="icon-weibo weibo"></a>
-                            <a href="{{.AppUrl}}login/qq" class="icon-qq-round qq"></a>
-                        </div>
-                    </form>
-                </li>
-                <li {{if .IsRegister}}class="active"{{end}}><a href="{{.AppUrl}}register">{{i18n .Lang "auth.register"}}</a></li>
-                {{end}}
             </ul>
+
+            {{else}}
+            <div class="nav navbar-nav navbar-right">
+                <a class="btn btn-sm btn-info navbar-btn" href="{{.AccountCenter}}/register?redirectURL={{.AppUrl}}">{{i18n .Lang "auth.register"}}</a> 
+                <a class="btn btn-sm btn-primary navbar-btn" style="margin-right:10px;" href="{{.AccountCenter}}/login?epic_sub_site={{.AppUrl}}">{{i18n .Lang "auth.login"}}</a>
+            </div>
+            {{end}}
         </div>
     </div>
 </nav>

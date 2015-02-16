@@ -20,9 +20,9 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/post"
-	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/post"
+	"github.com/beego/wetalk/modules/utils"
 )
 
 type TopicAdminRouter struct {
@@ -41,7 +41,7 @@ func (this *TopicAdminRouter) ObjectQs() orm.QuerySeter {
 // view for list model data
 func (this *TopicAdminRouter) List() {
 	var topics []models.Topic
-	qs := models.Topics().RelatedSel()
+	qs := models.Topics().OrderBy("-Category__id").RelatedSel()
 	if err := this.SetObjects(qs, &topics); err != nil {
 		this.Data["Error"] = err
 		beego.Error(err)
@@ -108,6 +108,7 @@ func (this *TopicAdminRouter) Update() {
 
 // view for confirm delete object
 func (this *TopicAdminRouter) Confirm() {
+
 }
 
 // view for delete object
@@ -115,13 +116,20 @@ func (this *TopicAdminRouter) Delete() {
 	if this.FormOnceNotMatch() {
 		return
 	}
-
-	// delete object
-	if err := this.object.Delete(); err == nil {
-		this.FlashRedirect("/admin/topic", 302, "DeleteSuccess")
+	//check whether there are posts under this topic
+	qs := models.Posts().Filter("Topic__id", this.object.Id)
+	cnt, _ := qs.Count()
+	if cnt > 0 {
+		this.FlashRedirect("/admin/topic", 302, "DeleteNotAllowed")
 		return
 	} else {
-		beego.Error(err)
-		this.Data["Error"] = err
+		// delete object
+		if err := this.object.Delete(); err == nil {
+			this.FlashRedirect("/admin/topic", 302, "DeleteSuccess")
+			return
+		} else {
+			beego.Error(err)
+			this.Data["Error"] = err
+		}
 	}
 }

@@ -46,7 +46,6 @@
                 "DistFile": "lib.min.css",
                 "SourceFiles": [
                     "bootstrap.css",
-                    "bootstrap-theme.css",
                     "font-awesome.min.css",
                     "prettify.css",
                     "select2.css"

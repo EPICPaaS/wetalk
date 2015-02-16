@@ -15,13 +15,8 @@
 package post
 
 import (
-	"strings"
-
-	"github.com/astaxie/beego"
-
-	"github.com/EPICPaaS/wetalk/modules/post"
-	"github.com/EPICPaaS/wetalk/modules/utils"
-	"github.com/EPICPaaS/wetalk/routers/base"
+	"fmt"
+	"github.com/beego/wetalk/routers/base"
 )
 
 type SearchRouter struct {
@@ -29,31 +24,7 @@ type SearchRouter struct {
 }
 
 func (this *SearchRouter) Get() {
-	this.TplNames = "search/posts.html"
-
-	pers := 25
-
-	q := strings.TrimSpace(this.GetString("q"))
-
-	this.Data["Q"] = q
-
-	if len(q) == 0 {
-		return
-	}
-
-	page, _ := utils.StrTo(this.GetString("p")).Int()
-
-	posts, meta, err := post.SearchPost(q, page)
-	if err != nil {
-		this.Data["SearchError"] = true
-		beego.Error("SearchPosts: ", err)
-		return
-	}
-
-	if len(posts) > 0 {
-		this.SetPaginator(pers, meta.TotalFound)
-	}
-
-	this.Data["Posts"] = posts
-	this.Data["Meta"] = meta
+	site := "site:golanghome.com"
+	q := this.GetString("q")
+	this.Redirect(fmt.Sprintf("http://cn.bing.com/search?q=%s %s", site, q), 302)
 }

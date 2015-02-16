@@ -20,9 +20,9 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/post"
-	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/post"
+	"github.com/beego/wetalk/modules/utils"
 )
 
 type PostAdminRouter struct {
@@ -40,7 +40,6 @@ func (this *PostAdminRouter) ObjectQs() orm.QuerySeter {
 
 func (this *PostAdminRouter) GetForm(create bool) post.PostAdminForm {
 	form := post.PostAdminForm{Create: create}
-	post.ListCategories(&form.Categories)
 	post.ListTopics(&form.Topics)
 	return form
 }
@@ -100,6 +99,8 @@ func (this *PostAdminRouter) Update() {
 
 	// update changed fields only
 	if len(changes) > 0 {
+		//fix the bug of category not updated
+		changes = append(changes, "Category")
 		form.SetToPost(&this.object)
 		if err := this.object.Update(changes...); err == nil {
 			this.FlashRedirect(url, 302, "UpdateSuccess")

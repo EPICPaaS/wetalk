@@ -18,11 +18,11 @@ import (
 	"github.com/astaxie/beego"
 	"strings"
 
-	"github.com/EPICPaaS/wetalk/modules/auth"
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/utils"
-	"github.com/EPICPaaS/wetalk/routers/base"
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/modules/auth"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/utils"
+	"github.com/beego/wetalk/routers/base"
+	"github.com/beego/wetalk/setting"
 )
 
 // LoginRouter serves login page.
@@ -36,6 +36,9 @@ func (this *LoginRouter) Get() {
 	this.TplNames = "auth/login.html"
 
 	loginRedirect := strings.TrimSpace(this.GetString("to"))
+	if loginRedirect == "" {
+		loginRedirect = this.Ctx.Input.Header("Referer")
+	}
 	if utils.IsMatchHost(loginRedirect) == false {
 		loginRedirect = "/"
 	}
@@ -120,6 +123,7 @@ ajaxError:
 // Logout implemented user logout page.
 func (this *LoginRouter) Logout() {
 	auth.LogoutUser(this.Ctx)
+
 	token := this.Ctx.GetCookie("epic_user_token")
 	auth.DestroyToken(token)
 	this.Redirect("/", 302)
@@ -137,7 +141,7 @@ func (this *RegisterRouter) Get() {
 		return
 	}
 
-	this.Data["IsRegister"] = true
+	this.Data["IsRegisterPage"] = true
 	this.TplNames = "auth/register.html"
 
 	form := auth.RegisterForm{Locale: this.Locale}
@@ -146,7 +150,7 @@ func (this *RegisterRouter) Get() {
 
 // Register implemented Post method for RegisterRouter.
 func (this *RegisterRouter) Register() {
-	this.Data["IsRegister"] = true
+	this.Data["IsRegisterPage"] = true
 	this.TplNames = "auth/register.html"
 
 	// no need login
@@ -162,10 +166,8 @@ func (this *RegisterRouter) Register() {
 
 	// Create new user.
 	user := new(models.User)
-	user.Company = form.CompanyName
-	user.QQ = form.QQ
-	user.TelNum = form.TelNum
-	if err := auth.RegisterUser(user, form.UserName, form.Email, form.Password); err == nil {
+
+	if err := auth.RegisterUser(user, form.UserName, form.Email, form.Password, this.Locale); err == nil {
 		auth.SendRegisterMail(this.Locale, user)
 
 		loginRedirect := this.LoginUser(user, false)

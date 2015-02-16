@@ -25,6 +25,9 @@
                     {{end}}
                     <p>
                         <a href="/admin/user/new" class="btn btn-default">{{i18n .Lang "model.new_user"}}</a>
+                         <form action="{{urlfor "UserAdminRouter.List"}}">
+                            <input type="text" name="q" value="{{.q}}" placeholder="{{i18n .Lang "auth.username_or_email"}}"/><input type="submit" value="{{i18n .Lang "search"}}"/>
+                        </form>
                     </p>
                     <table class="table table-hover table-condensed color-link">
                         <thead>

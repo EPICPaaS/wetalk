@@ -23,6 +23,11 @@
                         {{i18n .Lang "admin.success_delete"}}
                     </div>
                     {{end}}
+                    {{if .flash.DeleteNotAllowed}}
+                    <div class="alert alert-danger">
+                        {{i18n .Lang "admin.delete_topic_not_allowed"}}
+                    </div>
+                    {{end}}
                     <p>
                         <a href="/admin/topic/new" class="btn btn-default">{{i18n .Lang "model.new_topic"}}</a>
                     </p>
@@ -35,6 +40,7 @@
                                 <th>{{i18n .Lang "model.topic_order"}}</th>
                                 <th>{{i18n .Lang "model.created"}}</th>
                                 <th>{{i18n .Lang "model.updated"}}</th>
+                                <th>{{i18n .Lang "model.category"}}</th>
                         </thead>
                         <tbody>
                             {{range $topic := .Objects}}
@@ -45,6 +51,7 @@
                                 <td>{{$topic.Order}}</td>
                                 <td>{{$topic.Created|datetime}}</td>
                                 <td>{{$topic.Updated|datetime}}</td>
+                                <td>{{$topic.Category.Name}}</td>
                             </tr>
                             {{end}}
                         </tbody>

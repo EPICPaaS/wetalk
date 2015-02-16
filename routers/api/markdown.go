@@ -15,7 +15,7 @@
 package api
 
 import (
-	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/beego/wetalk/modules/utils"
 )
 
 func (this *ApiRouter) Markdown() {

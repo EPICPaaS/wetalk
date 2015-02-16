@@ -26,7 +26,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
 
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/setting"
 )
 
 func init() {
@@ -441,7 +441,7 @@ func initExtraField() {
 			return template.HTML(fmt.Sprintf(`<label>
             <input type="hidden" name="%s" value="%v">
             <button type="button" data-toggle="button" data-name="%s" class="btn btn-default btn-xs btn-checked%s">
-            	<i class="icon icon-ok"></i>
+            	<span class="glyphicon glyphicon-ok"></span>
         	</button>%s
         </label>`, fSet.Name, value, fSet.Name, active, fSet.LabelText))
 		}

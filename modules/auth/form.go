@@ -20,23 +20,20 @@ import (
 	"github.com/astaxie/beego/validation"
 	"github.com/beego/i18n"
 
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/utils"
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/utils"
+	"github.com/beego/wetalk/setting"
 )
 
 // Register form
 type RegisterForm struct {
-	UserName    string      `valid:"Required;AlphaDash;MinSize(5);MaxSize(30)"`
-	Email       string      `valid:"Required;Email;MaxSize(80)"`
-	CompanyName string      `valid:"MinSize(3);MaxSize(300)"`
-	QQ          string      `valid:"Required;MinSize(5);MaxSize(20)"`
-	TelNum      string      `valid:"Phone"`
-	Password    string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
-	PasswordRe  string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
-	Captcha     string      `form:"type(captcha)" valid:"Required"`
-	CaptchaId   string      `form:"type(empty)"`
-	Locale      i18n.Locale `form:"-"`
+	UserName   string      `valid:"Required;AlphaDash;MinSize(3);MaxSize(30)"`
+	Email      string      `valid:"Required;Email;MaxSize(80)"`
+	Password   string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
+	PasswordRe string      `form:"type(password)" valid:"Required;MinSize(4);MaxSize(30)"`
+	Captcha    string      `form:"type(captcha)" valid:"Required"`
+	CaptchaId  string      `form:"type(empty)"`
+	Locale     i18n.Locale `form:"-"`
 }
 
 func (form *RegisterForm) Valid(v *validation.Validation) {
@@ -64,35 +61,18 @@ func (form *RegisterForm) Valid(v *validation.Validation) {
 
 func (form *RegisterForm) Labels() map[string]string {
 	return map[string]string{
-		"UserName":    "auth.login_username",
-		"Email":       "auth.login_email",
-		"CompanyName": "auth.companyNme",
-		"QQ":          "auth.qq",
-		"TelNum":      "auth.telNum",
-		"Password":    "auth.login_password",
-		"PasswordRe":  "auth.retype_password",
-
-		"Captcha": "auth.captcha",
+		"UserName":   "auth.login_username",
+		"Email":      "auth.login_email",
+		"Password":   "auth.login_password",
+		"PasswordRe": "auth.retype_password",
+		"Captcha":    "auth.captcha",
 	}
 }
 
 func (form *RegisterForm) Helps() map[string]string {
 	return map[string]string{
-		"UserName": form.Locale.Tr("valid.min_length_is", 5) + ", " + form.Locale.Tr("valid.only_contains", "a-z 0-9 - _"),
+		"UserName": form.Locale.Tr("valid.min_length_is", 3) + ", " + form.Locale.Tr("valid.only_contains", "a-z 0-9 - _"),
 		"Captcha":  "auth.captcha_click_refresh",
-	}
-}
-
-func (form *RegisterForm) Placeholders() map[string]string {
-	return map[string]string{
-		"UserName":    "auth.plz_enter_username",
-		"Email":       "auth.plz_enter_email",
-		"CompanyName": "auth.plz_enter_companyNme",
-		"QQ":          "auth.plz_enter_qq",
-		"TelNum":      "auth.plz_enter_telNum",
-		"Password":    "auth.plz_enter_password",
-		"PasswordRe":  "auth.plz_reenter_password",
-		"Captcha":     "auth.plz_enter_captcha",
 	}
 }
 
@@ -151,6 +131,7 @@ func (form *ResetPwdForm) Valid(v *validation.Validation) {
 
 func (form *ResetPwdForm) Labels() map[string]string {
 	return map[string]string{
+		"Password":   "auth.type_newpassword",
 		"PasswordRe": "auth.retype_password",
 	}
 }
@@ -164,23 +145,22 @@ func (form *ResetPwdForm) Placeholders() map[string]string {
 
 // Settings Profile form
 type ProfileForm struct {
-	NickName    string                  `valid:"Required;MaxSize(30)"`
-	Url         string                  `valid:"MaxSize(100)"`
-	Company     string                  `valid:"MaxSize(30)"`
-	Location    string                  `valid:"MaxSize(30)"`
-	Info        string                  `form:"type(textarea)" valid:"MaxSize(255)"`
-	Email       string                  `valid:"Required;Email;MaxSize(100)"`
-	PublicEmail bool                    `valid:""`
-	GrEmail     string                  `valid:"Required;MaxSize(80)"`
-	Github      string                  `valid:"MaxSize(30)"`
-	Twitter     string                  `valid:"MaxSize(30)"`
-	Google      string                  `valid:"MaxSize(30)"`
-	Weibo       string                  `valid:"MaxSize(30)"`
-	Linkedin    string                  `valid:"MaxSize(30)"`
-	Facebook    string                  `valid:"MaxSize(30)"`
-	Lang        int                     `form:"type(select);attr(rel,select2)" valid:""`
-	LangAdds    models.SliceStringField `form:"type(select);attr(rel,select2);attr(multiple,multiple)" valid:""`
-	Locale      i18n.Locale             `form:"-"`
+	NickName    string      `valid:"Required;MaxSize(30)"`
+	Url         string      `valid:"MaxSize(100)"`
+	Company     string      `valid:"MaxSize(30)"`
+	Location    string      `valid:"MaxSize(30)"`
+	Info        string      `form:"type(textarea)" valid:"MaxSize(255)"`
+	Email       string      `valid:"Required;Email;MaxSize(100)"`
+	PublicEmail bool        `valid:""`
+	GrEmail     string      `valid:"Required;MaxSize(80)"`
+	Github      string      `valid:"MaxSize(30)"`
+	Twitter     string      `valid:"MaxSize(30)"`
+	Google      string      `valid:"MaxSize(30)"`
+	Weibo       string      `valid:"MaxSize(30)"`
+	Linkedin    string      `valid:"MaxSize(30)"`
+	Facebook    string      `valid:"MaxSize(30)"`
+	Lang        int         `form:"type(select);attr(rel,select2)" valid:""`
+	Locale      i18n.Locale `form:"-"`
 }
 
 func (form *ProfileForm) LangSelectData() [][]string {
@@ -192,35 +172,9 @@ func (form *ProfileForm) LangSelectData() [][]string {
 	return data
 }
 
-func (form *ProfileForm) LangAddsSelectData() [][]string {
-	langs := setting.Langs
-	data := make([][]string, 0, len(langs))
-	for i, lang := range langs {
-		data = append(data, []string{lang, utils.ToStr(i)})
-	}
-	return data
-}
-
 func (form *ProfileForm) Valid(v *validation.Validation) {
 	if len(i18n.GetLangByIndex(form.Lang)) == 0 {
 		v.SetError("Lang", "Can not be empty")
-	}
-
-	if len(form.LangAdds) > 0 {
-		adds := make(models.SliceStringField, 0, len(form.LangAdds))
-		for _, l := range form.LangAdds {
-			if d, err := utils.StrTo(l).Int(); err == nil {
-				if form.Lang == d {
-					continue
-				}
-				if len(i18n.GetLangByIndex(form.Lang)) == 0 {
-					v.SetError("Lang", "Can not be empty")
-					return
-				}
-				adds = append(adds, l)
-			}
-		}
-		form.LangAdds = adds
 	}
 }
 
@@ -251,7 +205,6 @@ func (form *ProfileForm) SaveUserProfile(user *models.User) error {
 func (form *ProfileForm) Labels() map[string]string {
 	return map[string]string{
 		"Lang":        "auth.profile_lang",
-		"LangAdds":    "auth.profile_lang_additional",
 		"NickName":    "model.user_nickname",
 		"PublicEmail": "auth.profile_publicemail",
 		"GrEmail":     "auth.profile_gremail",
@@ -312,45 +265,63 @@ func (form *PasswordForm) Placeholders() map[string]string {
 	}
 }
 
-type UserAdminForm struct {
-	Create      bool                    `form:"-"`
-	Id          int                     `form:"-"`
-	UserName    string                  `valid:"Required;AlphaDash;MinSize(5);MaxSize(30)"`
-	Email       string                  `valid:"Required;Email;MaxSize(100)"`
-	PublicEmail bool                    ``
-	NickName    string                  `valid:"Required;MaxSize(30)"`
-	Url         string                  `valid:"MaxSize(100)"`
-	Company     string                  `valid:"MaxSize(30)"`
-	QQ          string                  `valid:"Required;MinSize(5);MaxSize(20)"`
-	TelNum      string                  `valid:"Phone"`
-	Location    string                  `valid:"MaxSize(30)"`
-	Info        string                  `form:"type(textarea)" valid:"MaxSize(255)"`
-	GrEmail     string                  `valid:"Required;MaxSize(80)"`
-	Github      string                  `valid:"MaxSize(30)"`
-	Twitter     string                  `valid:"MaxSize(30)"`
-	Google      string                  `valid:"MaxSize(30)"`
-	Weibo       string                  `valid:"MaxSize(30)"`
-	Linkedin    string                  `valid:"MaxSize(30)"`
-	Facebook    string                  `valid:"MaxSize(30)"`
-	Followers   int                     ``
-	Following   int                     ``
-	IsAdmin     bool                    ``
-	IsActive    bool                    ``
-	IsForbid    bool                    ``
-	Lang        int                     `form:"type(select);attr(rel,select2)" valid:""`
-	LangAdds    models.SliceStringField `form:"type(select);attr(rel,select2);attr(multiple,multiple)" valid:""`
+// User avatar form
+type UserAvatarForm struct {
+	AvatarType int `form:"type(select);attr(rel,select2)" valid:""`
 }
 
-func (form *UserAdminForm) LangSelectData() [][]string {
-	langs := setting.Langs
-	data := make([][]string, 0, len(langs))
-	for i, lang := range langs {
-		data = append(data, []string{lang, utils.ToStr(i)})
-	}
+func (form *UserAvatarForm) AvatarTypeSelectData() [][]string {
+	var data = make([][]string, 0, 2)
+	data = append(data, []string{"auth.user_avatar_use_gravatar", utils.ToStr(setting.AvatarTypeGravatar)})
+	data = append(data, []string{"auth.user_avatar_use_personal", utils.ToStr(setting.AvatarTypePersonalized)})
+
 	return data
 }
 
-func (form *UserAdminForm) LangAddsSelectData() [][]string {
+func (form *UserAvatarForm) Labels() map[string]string {
+	return map[string]string{
+		"AvatarType": "auth.user_avatar_type",
+	}
+}
+
+func (form *UserAvatarForm) Valid(v *validation.Validation) {
+	if len(utils.ToStr(form.AvatarType)) == 0 {
+		v.SetError("AvatarType", "Please select")
+	}
+}
+
+func (form *UserAvatarForm) SetFromUser(user *models.User) {
+	utils.SetFormValues(user, form)
+}
+
+//User admin form
+type UserAdminForm struct {
+	Create      bool   `form:"-"`
+	Id          int    `form:"-"`
+	UserName    string `valid:"Required;AlphaDash;MinSize(3);MaxSize(30)"`
+	Email       string `valid:"Required;Email;MaxSize(100)"`
+	PublicEmail bool   ``
+	NickName    string `valid:"Required;MaxSize(30)"`
+	Url         string `valid:"MaxSize(100)"`
+	Company     string `valid:"MaxSize(30)"`
+	Location    string `valid:"MaxSize(30)"`
+	Info        string `form:"type(textarea)" valid:"MaxSize(255)"`
+	GrEmail     string `valid:"Required;MaxSize(80)"`
+	Github      string `valid:"MaxSize(30)"`
+	Twitter     string `valid:"MaxSize(30)"`
+	Google      string `valid:"MaxSize(30)"`
+	Weibo       string `valid:"MaxSize(30)"`
+	Linkedin    string `valid:"MaxSize(30)"`
+	Facebook    string `valid:"MaxSize(30)"`
+	Followers   int    ``
+	Following   int    ``
+	IsAdmin     bool   ``
+	IsActive    bool   ``
+	IsForbid    bool   ``
+	Lang        int    `form:"type(select);attr(rel,select2)" valid:""`
+}
+
+func (form *UserAdminForm) LangSelectData() [][]string {
 	langs := setting.Langs
 	data := make([][]string, 0, len(langs))
 	for i, lang := range langs {
@@ -372,23 +343,6 @@ func (form *UserAdminForm) Valid(v *validation.Validation) {
 
 	if len(i18n.GetLangByIndex(form.Lang)) == 0 {
 		v.SetError("Lang", "Can not be empty")
-	}
-
-	if len(form.LangAdds) > 0 {
-		adds := make(models.SliceStringField, 0, len(form.LangAdds))
-		for _, l := range form.LangAdds {
-			if d, err := utils.StrTo(l).Int(); err == nil {
-				if form.Lang == d {
-					continue
-				}
-				if len(i18n.GetLangByIndex(form.Lang)) == 0 {
-					v.SetError("Lang", "Can not be empty")
-					return
-				}
-				adds = append(adds, l)
-			}
-		}
-		form.LangAdds = adds
 	}
 }
 

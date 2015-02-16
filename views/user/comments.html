@@ -9,20 +9,21 @@
         <div class="col-md-3">
             {{template "user/component/user-info.html" .}}
         </div>
-        <div id="content" class="col-md-7">
+        <div id="content" class="col-md-9">
             <div class="box">
-                <div class="cell breadcrumb first">
-                    <a href="{{.TheUser.Link}}"><i class="icon-user"></i></a><i class="divider icon-angle-right"></i>{{i18n .Lang "user.recent_comments"}}
-                </div>
+                <ol class="breadcrumb">
+                    <li><a href="{{.TheUser.Link}}"><i class="icon-user"></i></a></li>
+                    <li>{{i18n .Lang "user.recent_comments"}}</li>
+                </ol>
                 {{if .TheUserComments}}
                 <div class="post-comments">
                     {{template "post/component/comments-user-home.html" dict "root" . "Comments" .TheUserComments}}
                 </div>
-                <div class="cell last low">
+                <div class="post-pager">
                     {{template "base/paginator_pn.html" .}}
                 </div>
                 {{else}}
-                <div class="cell last">
+                <div class="post-none">
                     {{i18n .Lang "user.lazy_info"}}
                 </div>
                 {{end}}

@@ -16,7 +16,7 @@ package attachment
 
 import (
 	"fmt"
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/setting"
 	"image"
 	"image/gif"
 	"image/jpeg"
@@ -30,8 +30,8 @@ import (
 
 	"github.com/astaxie/beego"
 
-	"github.com/EPICPaaS/wetalk/modules/models"
-	"github.com/EPICPaaS/wetalk/modules/utils"
+	"github.com/beego/wetalk/modules/models"
+	"github.com/beego/wetalk/modules/utils"
 )
 
 func SaveImage(m *models.Image, r io.ReadSeeker, mime string, filename string, created time.Time) error {
@@ -81,6 +81,11 @@ func SaveImage(m *models.Image, r io.ReadSeeker, mime string, filename string, c
 	m.Created = created
 
 	if err := m.Insert(); err != nil || m.Id <= 0 {
+		return err
+	}
+
+	m.Token = m.GetToken()
+	if err := m.Update(); err != nil {
 		return err
 	}
 

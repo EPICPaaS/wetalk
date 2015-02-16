@@ -9,52 +9,71 @@
         <div class="col-md-3">
             {{template "user/component/user-info.html" .}}
         </div>
-        <div class="col-md-7">
-            {{if .TheUserTopics}}
+        <div class="col-md-9">
+            {{if .TheUserFollowTopics}}
             <div class="box">
-                <div class="cell breadcrumb">
-                    <i class="divider icon-angle-down"></i>{{i18n .Lang "user.following_topics" .TheUser.NickName}}
+                <div class="breadcrumb">
+                    {{i18n .Lang "user.following_topics" .TheUser.NickName}}
                 </div>
-                <div class="cell nav-topics last">
-                    {{template "post/component/nav-topics.html" dict "Topics" .TheUserTopics "Lang" .Lang}}
-                    {{if .TheUserTopicsMore}}
-                    <div class="pull-right"><a target="_blank" href="{{.User.Link}}/favs">{{i18n .Lang "more"}} <i class="icon-double-angle-right"></i></a></div>
-                    {{end}}
+                <div class="nav-topics">
+                    {{template "post/component/nav-topics.html" dict "Topics" .TheUserFollowTopics "Lang" .Lang}}
                 </div>
+                {{if .TheUserFollowTopicsMore}}
+                <div class="more">
+                    <div class="pull-right"><a href="{{.TheUser.UserName}}/follow/topics">{{i18n .Lang "more"}} <span class="glyphicon glyphicon-arrow-right"></span></a></div>
+                    <span class="clearfix"></span>
+                </div>
+                {{end}}
+            </div>
+            {{end}}
+            {{if .TheUserFavoritePosts}}
+            <div class="box">
+                <div class="breadcrumb">
+                    {{i18n .Lang "user.favorite_posts" .TheUser.NickName}}
+                </div>
+                <div class="post-list">
+                    {{template "post/component/posts.html" dict "root" . "Posts" .TheUserFavoritePosts}}
+                </div>
+                {{if .TheUserFavoritePostsMore}}
+                 <div class="more">                    
+                    <div class="pull-right"><a href="{{.TheUser.UserName}}/favorite/posts">{{i18n .Lang "more"}} <span class="glyphicon glyphicon-arrow-right"></span></a></div>
+                    <span class="clearfix"></span>
+                </div>
+                {{end}}
             </div>
             {{end}}
             <div class="box">
-                <div class="cell breadcrumb">
-                    <i class="divider icon-angle-down"></i>{{i18n .Lang "user.recent_submited_posts"}}
+                <div class="breadcrumb">
+                    {{i18n .Lang "user.recent_submited_posts"}}
                 </div>
                 {{if .TheUserPosts}}
                 <div class="post-list">
                     {{template "post/component/posts-user-home.html" dict "root" . "Posts" .TheUserPosts}}
                 </div>
-                <div class="cell last low">
-                    <span class="pull-right"><a href="{{.TheUser.Link}}/posts"><i class="icon-caret-right"></i> {{i18n .Lang "user.more_posts"}}</a></span>
+                <div class="more">
+                    <span class="pull-right"><a href="{{.TheUser.Link}}/posts">{{i18n .Lang "user.more_posts"}} <span class="glyphicon glyphicon-arrow-right"></span></a></span>
                     <span class="clearfix"></span>
                 </div>
                 {{else}}
-                <div class="cell last">
+                <div class="last">
                     {{i18n .Lang "user.lazy_info"}}
                 </div>
                 {{end}}
             </div>
             <div class="box">
-                <div class="cell breadcrumb first">
-                    <i class="divider icon-angle-down"></i>{{i18n .Lang "user.recent_comments"}}
+                <div class="breadcrumb">
+                    {{i18n .Lang "user.recent_comments"}}
                 </div>
                 {{if .TheUserComments}}
                 <div class="post-comments">
                     {{template "post/component/comments-user-home.html" dict "root" . "Comments" .TheUserComments}}
                 </div>
-                <div class="cell last low">
-                    <span class="pull-right"><a href="{{.TheUser.Link}}/comments"><i class="icon-caret-right"></i> {{i18n .Lang "user.more_comments"}}</a></span>
+                <div class="more">
+                    <span class="pull-right"><a href="{{.TheUser.Link}}/comments">{{i18n .Lang "user.more_comments"}} <span class="glyphicon glyphicon-arrow-right"></span></a></span>
                     <span class="clearfix"></span>
                 </div>
                 {{else}}
-                <div class="cell last">
+                <div class="last">
                     {{i18n .Lang "user.lazy_info"}}
                 </div>
                 {{end}}

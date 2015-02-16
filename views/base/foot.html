@@ -1,38 +1,19 @@
-	<footer id="footer">
-		<div class="container footer-wrap">
-			<p>
-			<!--<a href="/about"><strong>{{i18n .Lang "about"}}</strong></a>
-				|
-				<a href="/faq"><strong>FAQ</strong></a>
-				|
-				<a target="_blank" href="https://github.com/beego/wetalk" target="_blank"><strong>GitHub</strong></a>
-		-->
-		        <a href="#"><strong>{{i18n .Lang "about"}}</strong></a>
-				|
-				<a href="#"><strong>FAQ</strong></a>
-				|
-				<a  href="#" ><strong>GitHub</strong></a>
-				</p>
-
-			<p>
-				{{i18n .Lang "copyright"}} © 2014 {{i18n .Lang "beego_community"}}
-			</p>
-			
-			<!--<p class="desc">
-				{{i18n .Lang "footer_desc"}}
-				<br>
-				Ver.{{.AppVer}} - {{.PageStartTime|loadtimes}}ms. {{i18n .Lang "powered_by"}} <a target="_blank" href="http://beego.me">Beego</a>. {{i18n .Lang "based_on"}} <a target="_blank" href="http://getbootstrap.com/">Bootstrap</a>. {{i18n .Lang "icons_from"}} <a target="_blank" href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</a>.
-			</p>
--->
-			<strong>{{i18n .Lang "language_choice"}}: </strong>
-		    <div class="btn-group dropup">
-			    <button type="button" class="btn btn-default btn-md dropdown-toggle" data-toggle="dropdown">{{i18n .Lang .Lang}} <i class="caret"></i></button>
-			    <ul class="dropdown-menu">
-			    	{{range .Langs}}
-			    		<li><a href="javascript::" data-lang="{{.}}" class="lang-changed">{{i18n $.Lang .}}</a></li>
-			    	{{end}}
-			    </ul>
-		    </div>
-		</div>
-		<input type="hidden" name="_once" value="{{.once_token}}" style="display:none;" />
-	</footer>
+<footer id="footer">
+	<div class="container">
+		<table class="basic-info">
+			<tbody>
+				<tr>
+					<td align="left">
+						&copy;&nbsp;{{i18n .Lang "app_name"}} | <a href="/about">{{i18n .Lang "about"}}</a> | <a href="/faq">FAQ</a>
+					</td>
+					<td align="right"><a href="http://www.miitbeian.gov.cn/" style="color:#aaa;text-decoration:none;">沪ICP备13014075号-2</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</footer>
+<div class="return-top" title="">
+  <span class="s"></span>
+  <span class="b"></span>
+</div>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>

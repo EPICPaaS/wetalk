@@ -20,14 +20,14 @@ import (
 
 	"github.com/astaxie/beego/orm"
 
-	"github.com/EPICPaaS/wetalk/modules/utils"
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/modules/utils"
+	"github.com/beego/wetalk/setting"
 )
 
 // global settings name -> value
 type Setting struct {
 	Id      int
-	Name    string `orm:"unique"`
+	Name    string `orm:"size(100);unique"`
 	Value   string `orm:"type(text)"`
 	Updated string `orm:"auto_now"`
 }
@@ -38,62 +38,47 @@ type Setting struct {
 // IsForbid: forbid user login
 type User struct {
 	Id          int
-	UserName    string           `orm:"size(30);unique"`
-	NickName    string           `orm:"size(30)"`
-	Password    string           `orm:"size(128)"`
-	Url         string           `orm:"size(100)"`
-	Company     string           `orm:"size(30)"`
-	Location    string           `orm:"size(30)"`
-	Email       string           `orm:"size(80);unique"`
-	GrEmail     string           `orm:"size(32)"`
-	Info        string           ``
-	Github      string           `orm:"size(30)"`
-	Twitter     string           `orm:"size(30)"`
-	Google      string           `orm:"size(30)"`
-	Weibo       string           `orm:"size(30)"`
-	Linkedin    string           `orm:"size(30)"`
-	Facebook    string           `orm:"size(30)"`
-	PublicEmail bool             ``
-	Followers   int              ``
-	Following   int              ``
-	FavTopics   int              ``
-	IsAdmin     bool             `orm:"index"`
-	IsActive    bool             `orm:"index"`
-	IsForbid    bool             `orm:"index"`
-	Lang        int              `orm:"index"`
-	LangAdds    SliceStringField `orm:"size(50)"`
-	Rands       string           `orm:"size(10)"`
-	Created     time.Time        `orm:"auto_now_add"`
-	Updated     time.Time        `orm:"auto_now"`
-	QQ          string           `orm:"size(20)"`
-	TelNum      string           `orm:"size(30)"`
+	UserName    string    `orm:"size(30);unique"`
+	NickName    string    `orm:"size(30);unique"`
+	Password    string    `orm:"size(128)"`
+	AvatarType  int       `orm:"default(1)"`
+	AvatarKey   string    `orm:"size(50)"`
+	Url         string    `orm:"size(100)"`
+	Company     string    `orm:"size(30)"`
+	Location    string    `orm:"size(30)"`
+	Email       string    `orm:"size(80);unique"`
+	GrEmail     string    `orm:"size(32)"`
+	Info        string    ``
+	Github      string    `orm:"size(30)"`
+	Twitter     string    `orm:"size(30)"`
+	Google      string    `orm:"size(30)"`
+	Weibo       string    `orm:"size(30)"`
+	Linkedin    string    `orm:"size(30)"`
+	Facebook    string    `orm:"size(30)"`
+	PublicEmail bool      ``
+	Followers   int       ``
+	Following   int       ``
+	FavPosts    int       ``
+	FavTopics   int       ``
+	IsAdmin     bool      `orm:"index"`
+	IsActive    bool      `orm:"index"`
+	IsForbid    bool      `orm:"index"`
+	Lang        int       `orm:"index"`
+	Rands       string    `orm:"size(10)"`
+	Created     time.Time `orm:"auto_now_add"`
+	Updated     time.Time `orm:"auto_now"`
 }
 
 func (m *User) Insert() error {
-
 	id := m.Id
-
-	//fmt.Println("id...")
-	//fmt.Println(m.Id)
-
-	//orm.Debug = true
 	m.Rands = GetUserSalt()
-
 	if _, err := orm.NewOrm().Insert(m); err != nil {
-
 		return err
 	}
-
-	fmt.Println(m.Email)
-	fmt.Println(m.Id)
-
 	o := orm.NewOrm()
 	o.QueryTable("user").Filter("email", m.Email).Update(orm.Params{
 		"id": id,
 	})
-
-	//fmt.Printf("Affected Num: %s, %s", num, err)
-
 	return nil
 }
 
@@ -135,8 +120,36 @@ func (m *User) Link() string {
 	return fmt.Sprintf("%suser/%s", setting.AppUrl, m.UserName)
 }
 
-func (m *User) AvatarLink() string {
-	return fmt.Sprintf("%s%s", setting.AvatarURL, m.GrEmail)
+func (m *User) avatarLink(size int) string {
+	if m.AvatarType == setting.AvatarTypePersonalized {
+		if m.AvatarKey != "" {
+			return fmt.Sprintf("%s", utils.GetQiniuZoomViewUrl(utils.GetQiniuPublicDownloadUrl(setting.QiniuAvatarDomain, m.AvatarKey), size, size))
+		} else {
+			return fmt.Sprintf("http://golanghome-public.qiniudn.com/golang_avatar.png?imageView/0/w/%s/h/%s/q/100", utils.ToStr(size), utils.ToStr(size))
+		}
+	} else {
+		return fmt.Sprintf("%s%s?size=%s", setting.AvatarURL, m.GrEmail, utils.ToStr(size))
+	}
+}
+
+func (m *User) AvatarLink24() string {
+	return m.avatarLink(24)
+}
+
+func (m *User) AvatarLink48() string {
+	return m.avatarLink(48)
+}
+
+func (m *User) AvatarLink64() string {
+	return m.avatarLink(64)
+}
+
+func (m *User) AvatarLink100() string {
+	return m.avatarLink(100)
+}
+
+func (m *User) AvatarLink200() string {
+	return m.avatarLink(200)
 }
 
 func (m *User) FollowingUsers() orm.QuerySeter {
@@ -153,6 +166,10 @@ func (m *User) RecentPosts() orm.QuerySeter {
 
 func (m *User) RecentComments() orm.QuerySeter {
 	return Comments().Filter("User", m.Id)
+}
+
+func (m *User) FavoritePosts() orm.QuerySeter {
+	return FavoritePosts().Filter("User", m.Id)
 }
 
 func Users() orm.QuerySeter {

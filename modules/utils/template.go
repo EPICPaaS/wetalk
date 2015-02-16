@@ -26,7 +26,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/beego/i18n"
 
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/setting"
 )
 
 // get HTML i18n string
@@ -126,6 +126,8 @@ func init() {
 	beego.AddFuncMap("loadtimes", loadtimes)
 	beego.AddFuncMap("sum", sum)
 	beego.AddFuncMap("loginto", loginto)
+	beego.AddFuncMap("isnotificationread", isnotificationread)
+	beego.AddFuncMap("getbulletintype", getbulletintype)
 }
 
 func RenderTemplate(TplNames string, Data map[interface{}]interface{}) string {
@@ -143,4 +145,27 @@ func RenderTemplate(TplNames string, Data map[interface{}]interface{}) string {
 	}
 	icontent, _ := ioutil.ReadAll(ibytes)
 	return string(icontent)
+}
+
+func isnotificationread(status int) bool {
+	var result = false
+	if status == setting.NOTICE_READ {
+		result = true
+	}
+	return result
+}
+
+func getbulletintype(lang string, t int) string {
+	var typeStr string
+	switch t {
+	case setting.BULLETIN_FRIEND_LINK:
+		typeStr = i18n.Tr(lang, "model.bulletin_friend_link")
+	case setting.BULLETIN_MOBILE_APP:
+		typeStr = i18n.Tr(lang, "model.bulletin_mobile_app")
+	case setting.BULLETIN_NEW_COMER:
+		typeStr = i18n.Tr(lang, "model.bulletin_new_comer")
+	case setting.BULLETIN_OPEN_SOURCE:
+		typeStr = i18n.Tr(lang, "model.bulletin_open_source")
+	}
+	return typeStr
 }

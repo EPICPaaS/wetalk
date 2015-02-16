@@ -7,48 +7,43 @@
 {{end}}
 {{define "body"}}
 <div class="row">
-    <div id="content" class="col-md-8">
-        <!-- Category and topic list -->
-    	<div class="box">
-            <div class="cell breadcrumb nav-cats first">
-                {{template "post/component/nav-list.html" .}}
-            </div>
-            
-            <div class="cell nav-cats last">
-                {{template "post/component/nav-cats.html" .}}
-            </div>
-        </div>
-        
-        <!-- Post list -->
+    <div id="content" class="col-md-9">
         <div class="box">
-            <div class="cell breadcrumb first">
-                <a href="{{.AppUrl}}"><i class="icon-level-up"></i> {{i18n .Lang "postnav.recent_posts"}}</a>
-            </div>
+            <div class="box-heading">
+                <!-- Category list -->
+                <div class="nav-cats">
+                    {{template "post/component/nav-cats.html" .}}
+                </div>
 
-            <div class="post-list">
-                {{template "post/component/posts.html" dict "root" . "Posts" .Posts}}
+                {{if .TopicsOfCategory}}
+                <!-- Topics of Category -->
+                <div class="nav-topics">
+                    {{template "post/component/nav-topics.html" dict "Topics" .TopicsOfCategory}}
+                </div>
+                {{end}}
             </div>
-
-            <div class="cell last low">
-                <i class="icon-rss-sign color-orange"></i> <a href="#">{{i18n .Lang "atom_feed_subscribe"}}</a>
-                <span class="pull-right"><a href="{{.AppUrl}}recent"><i class="icon-caret-right"></i> {{i18n .Lang "postnav.recent_posts"}}</a></span>
+            <!-- Post list -->
+            {{if .paginator.Nums}}
+            <div class="box-body">
+                <div class="post-list">
+                    {{template "post/component/posts.html" dict "root" . "Posts" .Posts}}
+                    <div class="post-pg">
+                        {{template "base/paginator_pn.html" .}}
+                    </div>
+                </div>
+                
             </div>
+            {{else}}
+                <div class="">
+                    <div class="text-center">{{i18n .Lang "postnav.not_found_posts"}}</div>
+                </div>
+            {{end}}
         </div>
-        
-        <!-- Topic list -->
-        <div class="box">
-            <div class="cell breadcrumb first">
-                {{i18n .Lang "postnav.list_topics"}}
-            </div>
-
-            <div class="cell nav-topics last">
-                {{template "post/component/nav-topics.html" .}}
-            </div>
-    	</div>
 	</div>
 
-    <div id="sidebar" class="col-md-4">
+    <div id="sidebar" class="col-md-3">
         {{template "post/component/sidebar.html" .}}
     </div>
+
 </div>
 {{end}}

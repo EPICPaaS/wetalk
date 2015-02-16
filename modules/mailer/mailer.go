@@ -21,7 +21,7 @@ import (
 
 	"github.com/astaxie/beego"
 
-	"github.com/EPICPaaS/wetalk/setting"
+	"github.com/beego/wetalk/setting"
 )
 
 type Message struct {
