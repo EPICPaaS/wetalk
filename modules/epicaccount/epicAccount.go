@@ -41,7 +41,7 @@ func (this *EpicAccount) Login() {
 			userNew.UserName = result.Username
 			userNew.Email = result.Email
 			userNew.IsActive = true
-
+			userNew.NickName = result.Username
 			err = userNew.Insert()
 
 			if err != nil {
