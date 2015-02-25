@@ -363,7 +363,8 @@ func reloadConfig() {
 
 func settingLocales() {
 	// load locales with locale_LANG.ini files
-	langs := "en-US|zh-CN"
+	//langs := "en-US|zh-CN"
+	langs := "zh-CN"
 	for _, lang := range strings.Split(langs, "|") {
 		lang = strings.TrimSpace(lang)
 		files := []string{"conf/" + "locale_" + lang + ".ini"}
