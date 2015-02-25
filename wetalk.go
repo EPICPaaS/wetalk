@@ -96,7 +96,15 @@ func Page_not_found(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		beego.Error(err)
 	}
-	t.Execute(rw, nil)
+
+	model := map[string]string{}
+	if !setting.IsProMode {
+		model["static"] = "static_source"
+	} else {
+		model["static"] = "static"
+	}
+
+	t.Execute(rw, model)
 }
 
 /*500错误页面*/
@@ -105,5 +113,13 @@ func Page_server_error(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		beego.Error(err)
 	}
-	t.Execute(rw, nil)
+
+	model := map[string]string{}
+	if !setting.IsProMode {
+		model["static"] = "static_source"
+	} else {
+		model["static"] = "static"
+	}
+
+	t.Execute(rw, model)
 }
