@@ -21,13 +21,6 @@
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
                 <li><a href="{{.AppUrl}}">{{i18n .Lang "home"}}</a></li>
-                <li><a href="{{.AppUrl}}topic/activity">{{i18n .Lang "activity"}}</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{i18n .Lang "tool"}} <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="http://gopm.io" target="_blank">{{i18n .Lang "gopm"}}</a></li>
-                    </ul>
-                </li>
             </ul>
             
             {{if .IsLogin}}

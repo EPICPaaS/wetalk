@@ -16,6 +16,9 @@
 package main
 
 import (
+	"net/http"
+	"text/template"
+
 	"github.com/astaxie/beego"
 	"github.com/beego/social-auth"
 
@@ -67,6 +70,10 @@ func main() {
 	}
 	beego.Info(beego.AppName, setting.APP_VER, setting.AppUrl)
 
+	beego.Errorhandler("404", Page_not_found)
+	beego.Errorhandler("500", Page_server_error)
+	beego.Errorhandler("503", Page_server_error)
+
 	//initialize the routers
 	routers.Initialize()
 	if !setting.IsProMode {
@@ -81,4 +88,22 @@ func main() {
 
 	// For all unknown pages.
 	beego.Run()
+}
+
+/*404处理页面*/
+func Page_not_found(rw http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles(beego.ViewsPath + "/web/404.html")
+	if err != nil {
+		beego.Error(err)
+	}
+	t.Execute(rw, nil)
+}
+
+/*500错误页面*/
+func Page_server_error(rw http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles(beego.ViewsPath + "/web/500.html")
+	if err != nil {
+		beego.Error(err)
+	}
+	t.Execute(rw, nil)
 }

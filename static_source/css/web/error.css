@@ -1,0 +1,42 @@
+body{
+	margin:0px;
+	padding:0px;
+	border:0px;
+    }
+.center-panel{
+    width:1000px;
+	position:absolute;
+	left:50%;
+	margin-left:-500px;
+	}
+/*-----------404and500-----------*/
+.not-find{
+	background-color:#eaeaea;
+	position:absolute;
+	top:0px;
+	bottom:0px;
+	width:100%;
+	}
+.not-find .not-find-img{
+	text-align:center;
+	height:420px;
+	}
+.not-find  .not-find-info{
+	width:290px;
+	margin-left:360px;
+	color:#000;
+	}
+.not-find-info a{
+	color:#1b8fc2;
+	text-decoration:none;
+	}
+.not-find-info .not-find-text{
+	font-size:12px;
+	height:24px;
+	line-height:24px;
+	font-weight:bold;
+	}
+.not-find-info label{
+	display:block;
+	}
+/*-----------404and500结束-----------*/
