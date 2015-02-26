@@ -114,6 +114,11 @@ func (this *SettingsRouter) SaveAvatarFileURL() {
 	fileUrl := this.GetString("fileUrl")
 	this.User.AvatarKey = fileUrl
 	this.User.Update("AvatarKey", "Updated")
+
+	data := map[string]interface{}{}
+	data["succeed"] = true
+	this.Data["json"] = data
+	this.ServeJson()
 }
 
 func (this *SettingsRouter) AvatarUpload() {

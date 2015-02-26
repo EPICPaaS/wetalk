@@ -139,6 +139,8 @@ function modify_avatarFile(fileUrl) {
         } else {
             alert("头像更新失败");
         }
+    }).fail(function (jqXHR, error) {
+        alert("远程调用失败,头像更新失败");
     });
 }
 
