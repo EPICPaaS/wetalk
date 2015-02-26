@@ -76,6 +76,7 @@
                             </form>
                             <img class="middle" src="{{.User.AvatarLink100}}" style="width:100px;height:100px;">
                             -->
+                            <p style="margin-bottom:10px;"><strong>{{i18n .Lang "auth.user_avatar_support_info"}}</strong></p>
                             <img id="idcardImg"  src="{{.User.AvatarLink100}}" style="width:100px;height:100px;" />
                             <input id="idcardFile" name="card" type="file" multiple="true" class="j-file">	
                         </div>
@@ -98,7 +99,7 @@ function uploadFileInit() {
         //  fileSizeLimit   : 0,                  // The maximum size of an uploadable file in KB (Accepts units B KB MB GB if string, 0 for no limit)  
         // successTimeout  : 30,                 // The number of seconds to wait for Flash to detect the server's response after the file has finished uploading  
         removeCompleted: true, // Remove queue items from the queue when they are done uploading  
-        fileSizeLimit: '1024KB',
+        fileSizeLimit: '500KB',
         buttonText: '修改头像',
         height: 20,
         width: 108,
