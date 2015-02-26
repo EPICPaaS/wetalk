@@ -30,3 +30,5 @@ tmp
 upload
 static/css
 static/js
+!/static_source/css/upload/
+!/static_source/js/upload/
