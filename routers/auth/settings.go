@@ -95,14 +95,14 @@ func (this *SettingsRouter) AvatarSettingSave() {
 	form := auth.UserAvatarForm{AvatarType: int(avatarType)}
 	this.Data["Form"] = form
 
-	//	if this.ValidFormSets(&form) {
-	//		if err := auth.SaveAvatarType(&this.User, int(avatarType)); err == nil {
-	//			this.FlashRedirect("/settings/avatar", 302, "AvatarSettingSave")
-	//			return
-	//		} else {
-	//			beego.Error("ProfileSave: avatar-setting", err)
-	//		}
-	//	}
+	if this.ValidFormSets(&form) {
+		if err := auth.SaveAvatarType(&this.User, int(avatarType)); err == nil {
+			this.FlashRedirect("/settings/avatar", 302, "AvatarSettingSave")
+			return
+		} else {
+			beego.Error("ProfileSave: avatar-setting", err)
+		}
+	}
 }
 
 func (this *SettingsRouter) SaveAvatarFileURL() {
