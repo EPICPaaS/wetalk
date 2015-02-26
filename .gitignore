@@ -32,3 +32,4 @@ static/css
 static/js
 !/static_source/css/upload/
 !/static_source/js/upload/
+!/static/img/upload/

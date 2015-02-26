@@ -5,7 +5,6 @@
 	{{template "meta" .}}
 	<meta name="_xsrf" content="{{.xsrf_token}}" />
 	<link rel="shortcut icon" href="{{.AppUrl}}static/img/favicon.png" />
-        <link type="text/css" rel="stylesheet" href="/{{.static}}/css/upload/uploadify.css" >
 	{{compress_css "lib"}}
 	{{str2html "<!--[if IE 7]>"}}
 	{{compress_css "ie7"}}
