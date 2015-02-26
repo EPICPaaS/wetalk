@@ -109,6 +109,11 @@ var (
 )
 
 var (
+	StorageServer string
+	UploadifySWF  string
+)
+
+var (
 	PostCountPerPage int
 )
 
@@ -356,6 +361,10 @@ func reloadConfig() {
 	QiniuPostDomain = Cfg.MustValue("qiniu", "qiniu_post_domain")
 	QiniuAvatarBucket = Cfg.MustValue("qiniu", "qiniu_avatar_bucket")
 	QiniuAvatarDomain = Cfg.MustValue("qiniu", "qiniu_avatar_domain")
+
+	// 文件存储
+	StorageServer = Cfg.MustValue("file_storage", "StorageServer")
+	UploadifySWF = Cfg.MustValue("file_storage", "UploadifySWF")
 
 	//post
 	PostCountPerPage = Cfg.MustInt("post", "post_count_per_page", 20)

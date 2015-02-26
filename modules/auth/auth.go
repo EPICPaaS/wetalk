@@ -17,7 +17,6 @@ package auth
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/astaxie/beego/context"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
@@ -26,18 +25,21 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/astaxie/beego/context"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/session"
 	"github.com/beego/i18n"
 
 	"encoding/json"
+	"net/http"
+	"strconv"
+
 	"github.com/beego/wetalk/modules/models"
 	"github.com/beego/wetalk/modules/utils"
 	"github.com/beego/wetalk/setting"
 	qio "github.com/qiniu/api/io"
-	"net/http"
-	"strconv"
 )
 
 // CanRegistered checks if the username or e-mail is available.

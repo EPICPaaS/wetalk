@@ -73,6 +73,15 @@ func (this *SettingsRouter) AvatarSetting() {
 	form := auth.UserAvatarForm{}
 	form.SetFromUser(&this.User)
 	this.SetFormSets(&form)
+
+	if !setting.IsProMode {
+		this.Data["static"] = "static_source"
+	} else {
+		this.Data["static"] = "static"
+	}
+
+	this.Data["StorageServer"] = setting.StorageServer
+	this.Data["UploadifySWF"] = setting.UploadifySWF
 }
 
 func (this *SettingsRouter) AvatarSettingSave() {
@@ -86,14 +95,25 @@ func (this *SettingsRouter) AvatarSettingSave() {
 	form := auth.UserAvatarForm{AvatarType: int(avatarType)}
 	this.Data["Form"] = form
 
-	if this.ValidFormSets(&form) {
-		if err := auth.SaveAvatarType(&this.User, int(avatarType)); err == nil {
-			this.FlashRedirect("/settings/avatar", 302, "AvatarSettingSave")
-			return
-		} else {
-			beego.Error("ProfileSave: avatar-setting", err)
-		}
+	//	if this.ValidFormSets(&form) {
+	//		if err := auth.SaveAvatarType(&this.User, int(avatarType)); err == nil {
+	//			this.FlashRedirect("/settings/avatar", 302, "AvatarSettingSave")
+	//			return
+	//		} else {
+	//			beego.Error("ProfileSave: avatar-setting", err)
+	//		}
+	//	}
+}
+
+func (this *SettingsRouter) SaveAvatarFileURL() {
+	//need login
+	if this.CheckLoginRedirect() {
+		return
 	}
+
+	fileUrl := this.GetString("fileUrl")
+	this.User.AvatarKey = fileUrl
+	this.User.Update("AvatarKey", "Updated")
 }
 
 func (this *SettingsRouter) AvatarUpload() {

@@ -17,6 +17,7 @@ package routers
 
 import (
 	"fmt"
+
 	"github.com/astaxie/beego"
 	"github.com/beego/wetalk/modules/epicaccount"
 	"github.com/beego/wetalk/routers/admin"
@@ -88,6 +89,7 @@ func Initialize() {
 	beego.Router("/settings/profile", settings, "get:Profile;post:ProfileSave")
 	beego.Router("/settings/change/password", settings, "get:ChangePassword;post:ChangePasswordSave")
 	beego.Router("/settings/avatar", settings, "get:AvatarSetting;post:AvatarSettingSave")
+	beego.Router("/settings/avatar/fileurl", settings, "get:AvatarSetting;post:SaveAvatarFileURL")
 	beego.Router("/settings/avatar/upload", settings, "post:AvatarUpload")
 
 	forgot := new(auth.ForgotRouter)
