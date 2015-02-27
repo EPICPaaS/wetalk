@@ -2,6 +2,7 @@ package attachment
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/gif"
@@ -9,11 +10,9 @@ import (
 	"image/png"
 	goio "io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/beego/wetalk/setting"
@@ -21,7 +20,7 @@ import (
 	"github.com/beego/wetalk/modules/models"
 )
 
-func SaveImageToFileServer(m *models.Image, r goio.ReadSeeker, mime string, filename string, created time.Time) error {
+func SaveImageToFileServer(m *models.Image, r goio.ReadSeeker, mime string, filename string, created time.Time) (string, error) {
 	var ext string
 
 	// check image mime type
@@ -40,7 +39,7 @@ func SaveImageToFileServer(m *models.Image, r goio.ReadSeeker, mime string, file
 		switch ext {
 		case ".jpg", ".png", ".gif":
 		default:
-			return fmt.Errorf("unsupport image format `%s`", filename)
+			return "", fmt.Errorf("unsupport image format `%s`", filename)
 		}
 	}
 
@@ -60,7 +59,7 @@ func SaveImageToFileServer(m *models.Image, r goio.ReadSeeker, mime string, file
 	}
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	m.Width = img.Bounds().Dx()
@@ -69,49 +68,50 @@ func SaveImageToFileServer(m *models.Image, r goio.ReadSeeker, mime string, file
 
 	//save to database
 	if err := m.Insert(); err != nil || m.Id <= 0 {
-		return err
+		return "", err
 	}
 
 	m.Token = m.GetToken()
 	if err := m.Update(); err != nil {
-		return err
+		return "", err
 	}
 
 	//reset reader pointer
 	if _, err := r.Seek(0, 0); err != nil {
-		return err
+		return "", err
 	}
 
 	// 上传文件服务器
 	request, err := newfileUploadRequest(setting.StorageServer+"/submit", map[string]string{}, filename, r)
 	if nil != err {
-		return err
+		return "", err
 	}
 
 	client := &http.Client{}
 	resp, err := client.Do(request)
 	if nil != err {
-		return err
-	} else {
-		body := &bytes.Buffer{}
-		_, err := body.ReadFrom(resp.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		resp.Body.Close()
-		fmt.Println(resp.StatusCode)
-		fmt.Println(resp.Header)
-
-		fmt.Println(body)
+		return "", err
 	}
 
-	return nil
-}
+	body, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return "", err
+	}
 
-var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"")
+	//		fmt.Println(resp.StatusCode)
+	//		fmt.Println(resp.Header)
 
-func escapeQuotes(s string) string {
-	return quoteEscaper.Replace(s)
+	//		fmt.Println(body)
+
+	var data map[string]interface{}
+	err = json.Unmarshal(body, &data)
+
+	if nil != err {
+		return "", err
+	}
+
+	return data["fileUrl"].(string), nil
 }
 
 // Creates a new file upload http request with optional extra params
@@ -121,8 +121,8 @@ func newfileUploadRequest(uri string, params map[string]string, filename string,
 		return nil, err
 	}
 
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
 	part, err := writer.CreateFormFile("file", filename)
 
 	if err != nil {
@@ -139,5 +139,8 @@ func newfileUploadRequest(uri string, params map[string]string, filename string,
 		return nil, err
 	}
 
-	return http.NewRequest("POST", uri, body)
+	ret, err := http.NewRequest("POST", uri, &body)
+	ret.Header.Set("Content-Type", writer.FormDataContentType())
+
+	return ret, err
 }

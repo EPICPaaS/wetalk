@@ -59,12 +59,13 @@ func (this *FileServerUploadRouter) Post() {
 	mime := handler.Header.Get("Content-Type")
 
 	// save and resize image
-	if err := attachment.SaveImageToFileServer(&image, file, mime, handler.Filename, t); err != nil {
+	fileUrl, err := attachment.SaveImageToFileServer(&image, file, mime, handler.Filename, t)
+	if err != nil {
 		beego.Error(err)
 		return
 	}
 
-	result["link"] = image.LinkMiddle()
+	result["link"] = "http://" + fileUrl
 	result["success"] = true
 
 }
