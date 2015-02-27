@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/astaxie/beego"
 	"github.com/beego/wetalk/setting"
 
 	"github.com/beego/wetalk/modules/models"
@@ -66,15 +67,15 @@ func SaveImageToFileServer(m *models.Image, r goio.ReadSeeker, mime string, file
 	m.Height = img.Bounds().Dy()
 	m.Created = created
 
-	//save to database
-	if err := m.Insert(); err != nil || m.Id <= 0 {
-		return "", err
-	}
+	//	//save to database
+	//	if err := m.Insert(); err != nil || m.Id <= 0 {
+	//		return "", err
+	//	}
 
-	m.Token = m.GetToken()
-	if err := m.Update(); err != nil {
-		return "", err
-	}
+	//	m.Token = m.GetToken()
+	//	if err := m.Update(); err != nil {
+	//		return "", err
+	//	}
 
 	//reset reader pointer
 	if _, err := r.Seek(0, 0); err != nil {
@@ -99,10 +100,9 @@ func SaveImageToFileServer(m *models.Image, r goio.ReadSeeker, mime string, file
 		return "", err
 	}
 
-	//		fmt.Println(resp.StatusCode)
-	//		fmt.Println(resp.Header)
-
-	//		fmt.Println(body)
+	//	beego.Info(resp.StatusCode)
+	//	beego.Info(resp.Header)
+	//	beego.Info(body)
 
 	var data map[string]interface{}
 	err = json.Unmarshal(body, &data)
@@ -110,6 +110,8 @@ func SaveImageToFileServer(m *models.Image, r goio.ReadSeeker, mime string, file
 	if nil != err {
 		return "", err
 	}
+
+	beego.Info(data)
 
 	return data["fileUrl"].(string), nil
 }
