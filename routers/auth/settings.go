@@ -15,6 +15,8 @@
 package auth
 
 import (
+	"strings"
+
 	"github.com/astaxie/beego"
 
 	"github.com/beego/wetalk/modules/auth"
@@ -28,16 +30,22 @@ type SettingsRouter struct {
 }
 
 func (this *SettingsRouter) ChangePassword() {
-	this.Data["IsUserSettingPage"] = true
-	this.TplNames = "settings/change_password.html"
+	//	this.Data["IsUserSettingPage"] = true
+	//	this.TplNames = "settings/change_password.html"
 
-	//need login
-	if this.CheckLoginRedirect() {
-		return
-	}
+	//	//need login
+	//	if this.CheckLoginRedirect() {
+	//		return
+	//	}
 
-	formPwd := auth.PasswordForm{}
-	this.SetFormSets(&formPwd)
+	//	formPwd := auth.PasswordForm{}
+	//	this.SetFormSets(&formPwd)
+
+	to := strings.TrimSpace(this.GetString("to"))
+
+	url := "http://" + setting.AccountCenterUrl + "/change/password/?epic_sub_site=" + to + "&epic_user_token=" + this.Ctx.GetCookie("epic_user_token")
+
+	this.Redirect(url, 302)
 }
 
 func (this *SettingsRouter) ChangePasswordSave() {
