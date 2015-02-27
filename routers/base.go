@@ -100,7 +100,9 @@ func Initialize() {
 		upload := new(attachment.QiniuUploadRouter)
 		beego.Router("/upload", upload, "post:Post")
 	} else {
-		upload := new(attachment.UploadRouter)
+		//upload := new(attachment.UploadRouter)
+		//beego.Router("/upload", upload, "post:Post")
+		upload := new(attachment.FileServerUploadRouter)
 		beego.Router("/upload", upload, "post:Post")
 	}
 

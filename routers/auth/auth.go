@@ -140,16 +140,31 @@ type RegisterRouter struct {
 
 // Get implemented Get method for RegisterRouter.
 func (this *RegisterRouter) Get() {
-	// no need login
-	if this.CheckLoginRedirect(false) {
-		return
+	//	this.Data["IsLoginPage"] = true
+	//	this.TplNames = "auth/login.html"
+
+	loginRedirect := strings.TrimSpace(this.GetString("to"))
+	if loginRedirect == "" {
+		loginRedirect = this.Ctx.Input.Header("Referer")
 	}
+	//	if utils.IsMatchHost(loginRedirect) == false {
+	//		loginRedirect = "/"
+	//	}
 
-	this.Data["IsRegisterPage"] = true
-	this.TplNames = "auth/register.html"
+	//	// no need login
+	//	if this.CheckLoginRedirect(false, loginRedirect) {
+	//		return
+	//	}
 
-	form := auth.RegisterForm{Locale: this.Locale}
-	this.SetFormSets(&form)
+	//	if len(loginRedirect) > 0 {
+	//		this.Ctx.SetCookie("login_to", loginRedirect, 0, "/")
+	//	}
+
+	//	form := auth.LoginForm{}
+	//	this.SetFormSets(&form)
+
+	url := "http://" + setting.AccountCenterUrl + "/register?redirectURL=" + loginRedirect
+	this.Redirect(url, 302)
 }
 
 // Register implemented Post method for RegisterRouter.
