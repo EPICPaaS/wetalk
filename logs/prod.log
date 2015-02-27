@@ -1,0 +1,8 @@
+2015/02/27 11:40:50 [wetalk.go:64] [I] AppPath: D:\GoGoGo\src\github.com\beego\wetalk 
+2015/02/27 11:40:50 [wetalk.go:67] [I] Product mode enabled 
+2015/02/27 11:40:50 [wetalk.go:71] [I] WeTalk Community 1.3.0.0 http://127.0.0.1:9090/ 
+2015/02/27 11:40:51 [app.go:96] [I] http server Running on :9090
+2015/02/27 11:41:47 [wetalk.go:64] [I] AppPath: D:\GoGoGo\src\github.com\beego\wetalk 
+2015/02/27 11:41:47 [wetalk.go:67] [I] Product mode enabled 
+2015/02/27 11:41:47 [wetalk.go:71] [I] WeTalk Community 1.3.0.0 http://127.0.0.1:9090/ 
+2015/02/27 11:41:48 [app.go:96] [I] http server Running on :9090

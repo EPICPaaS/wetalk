@@ -15,8 +15,9 @@
 package auth
 
 import (
-	"github.com/astaxie/beego"
 	"strings"
+
+	"github.com/astaxie/beego"
 
 	"github.com/beego/wetalk/modules/auth"
 	"github.com/beego/wetalk/modules/models"
@@ -32,28 +33,31 @@ type LoginRouter struct {
 
 // Get implemented login page.
 func (this *LoginRouter) Get() {
-	this.Data["IsLoginPage"] = true
-	this.TplNames = "auth/login.html"
+	//	this.Data["IsLoginPage"] = true
+	//	this.TplNames = "auth/login.html"
 
 	loginRedirect := strings.TrimSpace(this.GetString("to"))
 	if loginRedirect == "" {
 		loginRedirect = this.Ctx.Input.Header("Referer")
 	}
-	if utils.IsMatchHost(loginRedirect) == false {
-		loginRedirect = "/"
-	}
+	//	if utils.IsMatchHost(loginRedirect) == false {
+	//		loginRedirect = "/"
+	//	}
 
-	// no need login
-	if this.CheckLoginRedirect(false, loginRedirect) {
-		return
-	}
+	//	// no need login
+	//	if this.CheckLoginRedirect(false, loginRedirect) {
+	//		return
+	//	}
 
-	if len(loginRedirect) > 0 {
-		this.Ctx.SetCookie("login_to", loginRedirect, 0, "/")
-	}
+	//	if len(loginRedirect) > 0 {
+	//		this.Ctx.SetCookie("login_to", loginRedirect, 0, "/")
+	//	}
 
-	form := auth.LoginForm{}
-	this.SetFormSets(&form)
+	//	form := auth.LoginForm{}
+	//	this.SetFormSets(&form)
+
+	url := "http://" + setting.AccountCenterUrl + "/login?epic_sub_site=" + loginRedirect
+	this.Redirect(url, 302)
 }
 
 // Login implemented user login.

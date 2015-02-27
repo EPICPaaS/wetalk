@@ -1,0 +1,80 @@
+2015/02/27 11:41:58 [wetalk.go:64] [I] AppPath: D:\GoGoGo\src\github.com\beego\wetalk 
+2015/02/27 11:41:58 [wetalk.go:69] [I] Develment mode enabled 
+2015/02/27 11:41:58 [wetalk.go:71] [I] WeTalk Community 1.3.0.0 http://127.0.0.1:9090/ 
+2015/02/27 11:42:00 [app.go:96] [I] http server Running on :9090
+2015/02/27 11:42:00 [router.go:845] [D] | GET        | /img/9Zkaa.full.png                      | 292.0167ms       | notmatch   | 
+2015/02/27 11:42:09 [router.go:845] [D] | GET        | /img/9Zkaa.full.png                      | 44.0026ms        | notmatch   | 
+2015/02/27 11:43:19 [wetalk.go:64] [I] AppPath: D:\GoGoGo\src\github.com\beego\wetalk 
+2015/02/27 11:43:19 [wetalk.go:69] [I] Develment mode enabled 
+2015/02/27 11:43:19 [wetalk.go:71] [I] WeTalk Community 1.3.0.0 http://127.0.0.1:9090/ 
+2015/02/27 11:43:20 [app.go:96] [I] http server Running on :9090
+2015/02/27 11:43:20 [router.go:845] [D] | GET        | /img/9Zkaa.full.png                      | 94.0054ms        | notmatch   | 
+2015/02/27 11:46:11 [conf.go:427] [I] "conf\\app.ini": MODIFY 
+2015/02/27 11:46:11 [conf.go:438] [I] Config Reloaded 
+2015/02/27 11:46:20 [router.go:845] [D] | POST       | /upload                                  | 421.0241ms       | match      | /upload                                  | 
+2015/02/27 11:46:28 [router.go:845] [D] | GET        | /img/sXkaa.full.png                      | 332.0189ms       | notmatch   | 
+2015/02/27 11:46:46 [wetalk.go:64] [I] AppPath: D:\GoGoGo\src\github.com\beego\wetalk 
+2015/02/27 11:46:46 [wetalk.go:69] [I] Develment mode enabled 
+2015/02/27 11:46:46 [wetalk.go:71] [I] WeTalk Community 1.3.0.0 http://127.0.0.1:9090/ 
+2015/02/27 11:46:47 [app.go:96] [I] http server Running on :9090
+2015/02/27 11:46:50 [router.go:845] [D] | GET        | /img/sXkaa.full.png                      | 61.0035ms        | notmatch   | 
+2015/02/27 11:46:57 [storage.go:98] [I] upload/img/15/02/27/57/7/full.png 
+2015/02/27 11:46:57 [router.go:845] [D] | POST       | /upload                                  | 254.0145ms       | match      | /upload                                  | 
+2015/02/27 11:47:13 [router.go:845] [D] | GET        | /upload/img/15/02/27/57/7/full.png       | 38.0021ms        | notmatch   | 
+2015/02/27 11:47:16 [upload.go:94] [I] token `full` too short <- `5087487` 
+2015/02/27 11:47:16 [router.go:845] [D] | GET        | /img/15/02/27/57/7/full.png              | 2.0001ms         | notmatch   | 
+2015/02/27 11:47:18 [upload.go:94] [I] token `full` too short <- `5087487` 
+2015/02/27 11:47:18 [router.go:845] [D] | GET        | /img/15/02/27/57/7/full.png              | 3.0002ms         | notmatch   | 
+2015/02/27 11:48:00 [router.go:845] [D] | GET        | /img/r3laa.full.png                      | 67.0038ms        | notmatch   | 
+2015/02/27 11:54:48 [router.go:845] [D] | GET        | /settings/profile                        | 880.0504ms       | match      | /settings/profile                        | 
+2015/02/27 11:54:52 [router.go:845] [D] | GET        | /settings/avatar                         | 1.5710899s       | match      | /settings/avatar                         | 
+2015/02/27 13:22:53 [router.go:845] [D] | GET        | /img/r3laa.full.png                      | 4.0002ms         | notmatch   | 
+2015/02/27 13:22:55 [router.go:845] [D] | GET        | /img/r3laa.full.png                      | 13.0008ms        | notmatch   | 
+2015/02/27 13:36:00 [wetalk.go:64] [I] AppPath: D:\GoGoGo\src\github.com\beego\wetalk 
+2015/02/27 13:36:00 [wetalk.go:69] [I] Develment mode enabled 
+2015/02/27 13:36:00 [wetalk.go:71] [I] WeTalk Community 1.3.0.0 http://127.0.0.1:9090/ 
+2015/02/27 13:36:02 [app.go:96] [I] http server Running on :9090
+2015/02/27 13:36:08 [router.go:845] [D] | GET        | /logout                                  | 398.0228ms       | match      | /logout                                  | 
+2015/02/27 13:36:09 [router.go:845] [D] | GET        | /                                        | 756.0432ms       | match      | /                                        | 
+2015/02/27 13:36:14 [router.go:845] [D] | GET        | /category/分类1                            | 640.0366ms       | match      | /category/:slug                          | 
+2015/02/27 13:36:22 [router.go:845] [D] | GET        | /                                        | 711.0406ms       | match      | /                                        | 
+2015/02/27 13:36:34 [router.go:845] [D] | GET        | /recent                                  | 656.0375ms       | match      | /:sortSlug(recent|hot|cold)              | 
+2015/02/27 13:36:37 [router.go:845] [D] | GET        | /epic_login                              | 78.0044ms        | match      | /epic_login                              | 
+2015/02/27 13:36:41 [router.go:845] [D] | GET        | /                                        | 645.0369ms       | match      | /                                        | 
+2015/02/27 13:36:44 [router.go:845] [D] | GET        | /category/分类1                            | 694.0397ms       | match      | /category/:slug                          | 
+2015/02/27 13:36:47 [router.go:845] [D] | GET        | /new                                     | 1.5350878s       | match      | /new                                     | 
+2015/02/27 13:36:55 [post.go:422] [E] Can not find topic by id: 0 
+2015/02/27 13:36:55 [post.go:429] [D] Find category slug: 分类1 
+2015/02/27 13:36:55 [router.go:845] [D] | POST       | /new                                     | 647.037ms        | match      | /new                                     | 
+2015/02/27 13:37:03 [post.go:422] [E] Can not find topic by id: 0 
+2015/02/27 13:37:03 [post.go:429] [D] Find category slug: 分类1 
+2015/02/27 13:37:04 [router.go:845] [D] | POST       | /new                                     | 672.0384ms       | match      | /new                                     | 
+2015/02/27 13:37:10 [router.go:845] [D] | GET        | /category/分类1                            | 655.0375ms       | match      | /category/:slug                          | 
+2015/02/27 13:37:28 [router.go:845] [D] | GET        | /admin                                   | 646.037ms        | match      | /admin                                   | 
+2015/02/27 13:37:32 [router.go:845] [D] | GET        | /admin/topic                             | 1.7040975s       | match      | /admin/:model(topic)                     | 
+2015/02/27 13:37:36 [router.go:845] [D] | GET        | /admin/topic/new                         | 665.0381ms       | match      | /admin/:model(topic)/:id(new)            | 
+2015/02/27 13:37:53 [router.go:845] [D] | POST       | /admin/topic/new                         | 1.1050632s       | match      | /admin/:model(topic)/:id(new)            | 
+2015/02/27 13:38:00 [router.go:845] [D] | POST       | /admin/topic/new                         | 92.0053ms        | match      | /admin/:model(topic)/:id(new)            | 
+2015/02/27 13:38:01 [router.go:845] [D] | GET        | /admin/topic/1                           | 676.0387ms       | match      | /admin/:model(topic)/:id([0-9]+)         | 
+2015/02/27 13:38:07 [router.go:845] [D] | GET        | /                                        | 615.0352ms       | match      | /                                        | 
+2015/02/27 13:38:10 [router.go:845] [D] | GET        | /category/分类1                            | 667.0382ms       | match      | /category/:slug                          | 
+2015/02/27 13:38:12 [router.go:845] [D] | GET        | /new                                     | 657.0376ms       | match      | /new                                     | 
+2015/02/27 13:38:18 [post.go:429] [D] Find category slug: 分类1 
+2015/02/27 13:38:18 [router.go:845] [D] | POST       | /new                                     | 670.0383ms       | match      | /new                                     | 
+2015/02/27 13:38:23 [router.go:845] [D] | GET        | /category/分类1                            | 1.8861079s       | match      | /category/:slug                          | 
+2015/02/27 13:38:26 [router.go:845] [D] | GET        | /topic/话题1                               | 701.0401ms       | match      | /topic/:slug                             | 
+2015/02/27 13:38:29 [router.go:845] [D] | GET        | /new                                     | 673.0385ms       | match      | /new                                     | 
+2015/02/27 13:38:34 [router.go:845] [D] | POST       | /new                                     | 673.0385ms       | match      | /new                                     | 
+2015/02/27 13:38:41 [router.go:845] [D] | POST       | /new                                     | 92.0053ms        | match      | /new                                     | 
+2015/02/27 13:38:42 [router.go:845] [D] | GET        | /post/1                                  | 664.038ms        | match      | /post/:post([0-9]+)                      | 
+2015/02/27 13:38:51 [router.go:845] [D] | GET        | /logout                                  | 163.0094ms       | match      | /logout                                  | 
+2015/02/27 13:38:52 [router.go:845] [D] | GET        | /                                        | 763.0436ms       | match      | /                                        | 
+2015/02/27 13:38:54 [router.go:845] [D] | GET        | /post/1                                  | 656.0375ms       | match      | /post/:post([0-9]+)                      | 
+2015/02/27 13:41:42 [wetalk.go:64] [I] AppPath: D:\GoGoGo\src\github.com\beego\wetalk 
+2015/02/27 13:41:42 [wetalk.go:69] [I] Develment mode enabled 
+2015/02/27 13:41:42 [wetalk.go:71] [I] WeTalk Community 1.3.0.0 http://127.0.0.1:9090/ 
+2015/02/27 13:41:44 [app.go:96] [I] http server Running on :9090
+2015/02/27 13:41:50 [router.go:845] [D] | GET        | /login                                   | 178.0102ms       | match      | /login                                   | 
+2015/02/27 13:42:01 [router.go:845] [D] | GET        | /login                                   | 82.0046ms        | match      | /login                                   | 
+2015/02/27 13:42:04 [router.go:845] [D] | GET        | /epic_login                              | 84.0048ms        | match      | /epic_login                              | 
+2015/02/27 13:42:07 [router.go:845] [D] | GET        | /post/1                                  | 679.0388ms       | match      | /post/:post([0-9]+)                      | 
