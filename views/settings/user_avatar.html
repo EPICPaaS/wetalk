@@ -46,21 +46,7 @@
                     </div>
                     {{end}}
                     <h3 class="underline">{{i18n .Lang "auth.user_avatar_setting"}}</h3>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <form method="POST" action="{{.AppUrl}}settings/avatar">
-                                {{.xsrf_html}}{{.once_html}}
-
-                                {{template "base/form/fields.html" .UserAvatarFormSets}}
-
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-primary">{{i18n .Lang "auth.user_avatar_save"}} <span class="glyphicon glyphicon-circle-arrow-right"></span></button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <h3 class="underline">{{i18n .Lang "auth.user_avatar_upload"}}</h3>
+                    
                     <div class="row">
                         <div class="col-md-8">
                             <!--
@@ -100,7 +86,7 @@ function uploadFileInit() {
         // successTimeout  : 30,                 // The number of seconds to wait for Flash to detect the server's response after the file has finished uploading  
         removeCompleted: true, // Remove queue items from the queue when they are done uploading  
         fileSizeLimit: '500KB',
-        buttonText: '修改头像',
+        buttonText: '设置头像',
         height: 20,
         width: 108,
         auto: true,

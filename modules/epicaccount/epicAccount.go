@@ -42,6 +42,8 @@ func (this *EpicAccount) Login() {
 			userNew.Email = result.Email
 			userNew.IsActive = true
 			userNew.NickName = result.Username
+			userNew.AvatarType = 2
+			userNew.AvatarKey = "/static/img/default_avator.png"
 			err = userNew.Insert()
 
 			if err != nil {
