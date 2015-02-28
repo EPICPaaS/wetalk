@@ -67,12 +67,12 @@ a:after
   text-decoration: none;
   font-size: 13px;
   padding: 5px;
-  color: #017e66;
+  color: #428BCA;
   background-color: #E7F2ED;
 }
 
 .nav-topics .topic a:hover {
-  background-color: #017e66;
+  background-color: #428BCA;
   color: #fff;
 }
 /* search-box */

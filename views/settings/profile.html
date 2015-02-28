@@ -102,28 +102,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                {{with .ProfileFormSets.Fields.GrEmail}}
-                                <div class="form-group{{if .Error}} has-error{{end}}">
-                                    {{.Label}}
-                                    <div class="profile-avatar avatar" data-url="{{$.AvatarURL}}">
-                                        <img src="{{$.AvatarURL}}{{.Value}}">
-                                        <img src="{{$.AvatarURL}}{{.Value}}" class="middle">
-                                        <img src="{{$.AvatarURL}}{{.Value}}" class="small">
-                                    </div>
-                                    {{call .Field}}
-                                    {{if .Error}}<p class="error-block">{{.Error}}</p>{{end}}
-                                    {{if .Help}}<p class="help-block">{{.Help}}</p>{{end}}
-                                </div>
-                                {{end}}
-
-                            </div>
-
-                            <div class="col-md-6">
-                                {{template "base/form/field_group.html" .ProfileFormSets.Fields.Info}}
-                            </div>
-                        </div>
+                        
 
                         <div class="row">
                             <div class="col-md-6">
@@ -139,6 +118,17 @@
                             <div class="col-md-6">
                                 {{template "base/form/field_group.html" .ProfileFormSets.Fields.Lang}}
                             </div>
+                        </div>
+						
+						<div class="row">
+						    <div class="col-md-6">
+                                {{template "base/form/field_group.html" .ProfileFormSets.Fields.Info}}
+                            </div>
+                            <div class="col-md-6">
+                               
+                            </div>
+
+                            
                         </div>
 
                         <h3 class="underline">{{i18n .Lang "auth.social_info"}}</h3>
