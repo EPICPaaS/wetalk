@@ -128,7 +128,7 @@ textarea.form-control {
 .dropdown-menu > li > a:hover {
     color: rgb(255, 255, 255);
     background-color: rgb(0, 131, 174);
-    background-image: linear-gradient(to bottom, rgb(0, 139, 184), rgb(0, 120, 159));
+    background-image: linear-gradient(to bottom, #aa2329, #aa2329);
 }
 
 /* form help block */

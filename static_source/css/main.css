@@ -135,7 +135,7 @@ a:after
     display: none;
     width: 40px;
     height: 40px;
-    border: 1px solid #61b72e;
+    border: 1px solid #140b26;
     background: #fff;
     box-shadow: 0 0 5px #F5F5F5;
     text-indent: -9999px;
@@ -150,7 +150,7 @@ a:after
     width: 0;
     height: 0;
     border-width: 10px;
-    border-color: transparent transparent #61b72e;
+    border-color: transparent transparent #140b26;
     border-style: dashed dashed solid;
 }
 .return-top .b {
@@ -159,7 +159,7 @@ a:after
     left: 16px;
     height: 12px;
     width: 8px;
-    background: #61b72e;
+    background: #140b26;
 }
 /* post-list */
 .post-list .post{

@@ -48,8 +48,10 @@
 
             {{else}}
             <div class="nav navbar-nav navbar-right">
-                <a class="btn btn-sm btn-info navbar-btn" href="{{.AccountCenter}}/register?redirectURL={{.AppUrl}}">{{i18n .Lang "auth.register"}}</a> 
-                <a class="btn btn-sm btn-primary navbar-btn" style="margin-right:10px;" href="{{.AccountCenter}}/login?epic_sub_site={{.AppUrl}}">{{i18n .Lang "auth.login"}}</a>
+                <a class="btn btn-sm btn-info navbar-btn" href="{{.AccountCenter}}/register?redirectURL={{.AppUrl}}" style="background-color: #aa2329;
+border-color: #aa2329;border-radius:  2px;">{{i18n .Lang "auth.register"}}</a> 
+                <a class="btn btn-sm btn-primary navbar-btn" style="margin-right:10px; background-color: #140b26;
+border-color: #140b26;border-radius: 2px; " href="{{.AccountCenter}}/login?epic_sub_site={{.AppUrl}}">{{i18n .Lang "auth.login"}}</a>
             </div>
             {{end}}
         </div>
