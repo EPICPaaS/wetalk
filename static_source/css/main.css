@@ -1,6 +1,26 @@
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    color: #aa2329;
+}
+
 /* navbar */
 .navbar {
   font-size: 16px;
+  background-color: #2c263a; 
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: whitesmoke;
+}
+
+.navbar-default .navbar-nav > li > a:hover {
+    color: whitesmoke;
+}
+
+.navbar-default .navbar-nav > li > 
+a:visited
+a:after 
+{
+    color: whitesmoke;
 }
 
 .navbar .logo img {
@@ -80,7 +100,7 @@
 
 .sidebar-list li a{
   font-size: 12px;
-  color: #888;
+  color: #bababa;
 }
 
 .sidebar-list li a:hover{
@@ -144,7 +164,7 @@
 /* post-list */
 .post-list .post{
   padding: 10px 0;
-  border-bottom: 1px dashed #ccc;
+  border-bottom: 1px dashed #dadada;
 }
 .post-list .post .avatar {
   float: left;
@@ -166,7 +186,7 @@
 }
 
 .post-list .post .meta {
-  color: #aaa;
+  color: #bababa;
   margin: 7px 0 0 65px;
   font-size: 12px;
 }
@@ -188,7 +208,7 @@
 }
 
 .post-list .post .data {
-  color: #aaa;
+  color: #bababa;
 }
 
 .post-list .post .data span {
@@ -210,7 +230,7 @@
 
 .post-show .post-meta {
   font-size: 12px;
-  color: #aaa;
+  color: #bababa;
   padding: 5px 0;
 }
 
@@ -385,7 +405,7 @@
 }
 
 .topic-info .topic-meta .badge {
-  background-color: #aaa;
+  background-color: #bababa;
 }
 
 .topic-info .topic-meta .input-group-addon,
@@ -654,7 +674,7 @@
 }
 
 .user-stats table span{
-  color: #aaa;
+  color: #bababa;
 }
 
 
@@ -670,7 +690,7 @@
 }
 
 .notice-list .notice .notice-time{
-  color:#aaa;
+  color:#bababa;
 }
 
 .notice-list .notice .notice-content{
