@@ -34,3 +34,5 @@ static/js
 !/static_source/js/upload/
 !/static/img/upload/
 logs/prod.log
+*.log
+*.log

@@ -76,7 +76,7 @@ func (m *User) Insert() error {
 		return err
 	}
 	o := orm.NewOrm()
-	o.QueryTable("user").Filter("email", m.Email).Update(orm.Params{
+	o.QueryTable("user").Filter("user_name", m.UserName).Update(orm.Params{
 		"id": id,
 	})
 	return nil

@@ -152,7 +152,7 @@ type ProfileForm struct {
 	Info        string      `form:"type(textarea)" valid:"MaxSize(255)"`
 	Email       string      `valid:"Required;Email;MaxSize(100)"`
 	PublicEmail bool        `valid:""`
-	GrEmail     string      `valid:"Required;MaxSize(80)"`
+	GrEmail     string      `valid:"MaxSize(80)"`
 	Github      string      `valid:"MaxSize(30)"`
 	Twitter     string      `valid:"MaxSize(30)"`
 	Google      string      `valid:"MaxSize(30)"`
