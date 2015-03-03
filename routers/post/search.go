@@ -24,7 +24,7 @@ type SearchRouter struct {
 }
 
 func (this *SearchRouter) Get() {
-	site := "site:golanghome.com"
+	site := "site:community.yopyun.com"
 	q := this.GetString("q")
 	this.Redirect(fmt.Sprintf("http://cn.bing.com/search?q=%s %s", site, q), 302)
 }

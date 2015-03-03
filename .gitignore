@@ -36,3 +36,6 @@ static/js
 logs/prod.log
 *.log
 *.log
+*.log
+logs/dev.log
+*.log
